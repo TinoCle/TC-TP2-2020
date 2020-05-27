@@ -1,1 +1,5 @@
-bin/app/alParser$*
+*alParser$*
+.classpath
+.project
+.settings/
+.vscode
