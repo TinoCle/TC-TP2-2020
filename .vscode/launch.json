@@ -12,10 +12,10 @@
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-App<TP1>",
+            "name": "Debug (Launch)-App<TP2>",
             "request": "launch",
             "mainClass": "app.App",
-            "projectName": "TP1"
+            "projectName": "TP2"
         },
         {
             "name": "Debug current grammar",
