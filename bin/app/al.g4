@@ -50,7 +50,7 @@ FLOTANTE: NUMERO'.'NUMERO ;
 WS : [ \n\t] -> skip ; 
 OTRO: .;
 
-prog : instrucciones ;
+prog : instrucciones EOF ;
 
 instrucciones : instruccion instrucciones
               | 
