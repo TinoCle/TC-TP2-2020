@@ -19,9 +19,12 @@ public class App {
         
         // create a parser that feeds off the tokens buffer
         alParser parser = new alParser(tokens);
-                
+        
+        Listener listener = new Listener();
+
+        parser.addParseListener(listener);
         // Solicito al parser que comience indicando una regla gramatical
         // En este caso la regla es el simbolo inicial
-        parser.balance();
+        parser.prog();
     }
 }

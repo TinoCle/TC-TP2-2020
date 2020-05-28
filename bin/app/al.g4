@@ -149,6 +149,7 @@ factor : prefix PA opal PC
        | prefix NUMERO
        | prefix ID
 	   | prefix funcion
+	   | '\''OTRO'\'' 
        ;
 
 // NOT es el unico que le sigue prefix porque se pueden poner varios ! seguidos
