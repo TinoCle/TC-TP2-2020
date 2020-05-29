@@ -15,7 +15,7 @@
             "name": "Debug (Launch)-App<TP2>",
             "request": "launch",
             "mainClass": "app.App",
-            "projectName": "TP2"
+            "projectName": "TP1"
         },
         {
             "name": "Debug current grammar",
