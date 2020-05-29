@@ -1,6 +1,7 @@
 package app;
 
 import app.alParser.AsignacionContext;
+import java.util.HashMap;
 
 // import org.antlr.v4.runtime.ParserRuleContext;
 // import org.antlr.v4.runtime.tree.ErrorNode;
@@ -10,9 +11,13 @@ public class Listener extends alBaseListener{
 
     SymbolTable symbolTable = new SymbolTable();
     ErrorMessages error = new ErrorMessages();
+    HashMap<Integer, String> dataTypes = new HashMap<>();
 
     public Listener() {
         System.out.println("\n");
+        dataTypes.put(alLexer.NUMERO, "int");
+        dataTypes.put(alLexer.FLOTANTE, "double");
+        dataTypes.put(alLexer.LITERAL, "char");
     }
 
     @Override public void enterBloque(alParser.BloqueContext ctx) {
@@ -54,12 +59,7 @@ public class Listener extends alBaseListener{
 
 
     private boolean checkDataType(String variableType, int dataType){
-        if (alLexer.NUMERO == dataType && variableType.equals("int")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return dataTypes.get(dataType).equals(variableType);
     }
     
 
