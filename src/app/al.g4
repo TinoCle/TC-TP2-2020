@@ -149,6 +149,7 @@ term : '*' factor term
 factor : prefix PA opal PC
        | prefix NUMERO
        | prefix ID
+	   | prefix FLOTANTE
 	   | prefix funcion
 	   | prefix LITERAL
        ;
