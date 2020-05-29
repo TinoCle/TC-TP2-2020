@@ -6,8 +6,6 @@ grammar al;
 
 fragment LETRA : [A-Za-z] ;
 fragment DIGITO : [0-9] ;
-fragment SYMBOL : '~'  | '!' | '@' | '#'  | '$' | '%' | '^' | '-' | '+' |
-				  '\\' | ':' | '"' | '\'' | '<' | '>' | ',' | '.' | '?' | '/' ;
 
 // MAYUSCULAS: tokens
 // Minusculas: reglas gramaticales
@@ -49,7 +47,7 @@ NOT 	: '!'	   ;
 ID		: (LETRA | '_') (LETRA | DIGITO |'_')*;
 NUMERO	: DIGITO+;
 FLOTANTE: NUMERO'.'NUMERO ;
-LITERAL : '\'' (LETRA | DIGITO | SYMBOL) '\'' ;
+LITERAL : '\'' OTRO '\'' ;
 WS : [ \n\t] -> skip ; 
 OTRO: .; 
 
@@ -109,7 +107,7 @@ tipodato : INT
 declaracion : tipodato ID
 			| tipodato ID asign
 			;
-
+ 
 asign : EQ operacion
 	  ;
 
