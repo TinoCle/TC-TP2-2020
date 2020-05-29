@@ -47,7 +47,7 @@ NOT 	: '!'	   ;
 ID		: (LETRA | '_') (LETRA | DIGITO |'_')*;
 NUMERO	: DIGITO+;
 FLOTANTE: NUMERO'.'NUMERO ;
-LITERAL : '\'' OTRO '\'' ;
+LITERAL : '\'' (LETRA | DIGITO | OTRO) '\'' ;
 WS : [ \n\t] -> skip ; 
 OTRO: .; 
 
