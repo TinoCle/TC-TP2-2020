@@ -13,6 +13,7 @@ public class SymbolTable {
 
     public SymbolTable() {
         symbolTable = new LinkedList<HashMap<String, ID>>();
+        addContext();
     }
 
     public void addContext() {
