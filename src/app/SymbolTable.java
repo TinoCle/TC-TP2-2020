@@ -26,7 +26,6 @@ public class SymbolTable {
 
     public void insertID(String name, ID id) {
         symbolTable.getLast().put(name, id);
-        System.out.println("\nID " + name + " insertado en el contexto " + symbolTable.size());
     }
 
     public boolean checkVariableDeclared(String name){
@@ -35,10 +34,7 @@ public class SymbolTable {
 
     public boolean checkVariable(String name){
         ID id = this.symbolTable.getLast().get(name);
-        if (id == null){
-            return false;
-        }
-        return true;
+        return id != null;
     }
 
     public ID getId(String name){
