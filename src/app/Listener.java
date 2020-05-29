@@ -37,6 +37,9 @@ public class Listener extends alBaseListener{
             // System.out.println("\n" + id.toString());
             symbolTable.insertID(ctx.ID().getText(), id);    
         }
+        if (id.isInitialized() && !checkDataType(id.getType(), ctx.getStop().getType())) {
+            error.variableType(ctx.getStop().getLine());
+        }
     }
 
     @Override
@@ -47,9 +50,9 @@ public class Listener extends alBaseListener{
         } else{
             ID id = symbolTable.getId(idName);
             
-            boolean initialized = checkDataType(id.getDataType(), ctx.getStop().getType());
+            boolean initialized = checkDataType(id.getType(), ctx.getStop().getType());
             if (!initialized){
-                error.badSyntax(ctx.getStop().getLine());
+                error.variableType(ctx.getStop().getLine());
             }
             else{
                 this.symbolTable.setInitialized(id.getName(), initialized);
@@ -59,6 +62,7 @@ public class Listener extends alBaseListener{
 
 
     private boolean checkDataType(String variableType, int dataType){
+        System.out.println("Asigning " + dataTypes.get(dataType) + " to a " + variableType + " variable.");
         return dataTypes.get(dataType).equals(variableType);
     }
     

@@ -13,7 +13,7 @@ public class ErrorMessages {
         System.out.println(ANSI_RED + "ERROR Line " + line+ ": The variable '" + name + "' wasn't declared." + ANSI_RESET);
     }
 
-    public void badSyntax(int line) {
-        System.out.println(ANSI_RED + "ERROR Line " + line+ ": Bad syntax." + ANSI_RESET);
+    public void variableType(int line) {
+        System.out.println(ANSI_RED + "ERROR Line " + line+ ": Variable type missmatching." + ANSI_RESET);
     }
 }

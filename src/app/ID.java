@@ -22,7 +22,7 @@ public class ID {
         return "\nID Found\nName: " + name + "\nType: " + type + "\nInitialized: " + initialized;
     }
 
-    public String getDataType(){
+    public String getType(){
         return this.type;
     }
 
