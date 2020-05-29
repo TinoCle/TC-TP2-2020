@@ -21,4 +21,22 @@ public class ID {
     public String toString() {
         return "\nID Found\nName: " + name + "\nType: " + data_type + "\nInitialized: " + initialized;
     }
+
+    public String getDataType(){
+        return this.data_type;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public boolean isInitialized(){
+        return this.initialized;
+    }
+
+    public boolean isUsed(){
+        return this.used;
+    }
+
+
 }

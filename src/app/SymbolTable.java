@@ -29,4 +29,24 @@ public class SymbolTable {
         System.out.println("\nID " + name + " insertado en el contexto " + symbolTable.size());
     }
 
+    public boolean checkVariableDeclared(String name){
+        return this.symbolTable.getLast().containsKey(name);
+    }
+
+    public boolean checkVariable(String name){
+        ID id = this.symbolTable.getLast().get(name);
+        if (id == null){
+            return false;
+        }
+        return true;
+    }
+
+    public ID getId(String name){
+        return this.symbolTable.getLast().get(name);
+    }
+
+    public void setInitialized(String name, boolean initialized){
+        this.symbolTable.getLast().get(name).setInitialized(initialized);
+    }
+
 }
