@@ -6,12 +6,14 @@ grammar al;
 
 fragment LETRA : [A-Za-z] ;
 fragment DIGITO : [0-9] ;
+fragment SYMBOL : '~'  | '!' | '@' | '#'  | '$' | '%' | '^' | '-' | '+' |
+				  '\\' | ':' | '"' | '\'' | '<' | '>' | ',' | '.' | '?' | '/' ;
 
 // MAYUSCULAS: tokens
 // Minusculas: reglas gramaticales
 
 PA : '(' ;
-PC : ')' ;
+PC : ')' ; 
 
 CA : '[' ;
 CC : ']' ;
@@ -31,7 +33,7 @@ DO      : 'do'	   ;
 WHILE   : 'while'  ;
 FOR     : 'for'    ;
 IF      : 'if'     ;
-ELIF    : 'else if';
+ELIF    : 'else if'; 
 ELSE    : 'else'   ;
 
 MENOR 	: '<'      ;
@@ -47,8 +49,9 @@ NOT 	: '!'	   ;
 ID		: (LETRA | '_') (LETRA | DIGITO |'_')*;
 NUMERO	: DIGITO+;
 FLOTANTE: NUMERO'.'NUMERO ;
+LITERAL : '\'' (LETRA | DIGITO | SYMBOL) '\'' ;
 WS : [ \n\t] -> skip ; 
-OTRO: .;
+OTRO: .; 
 
 prog : instrucciones EOF ;
 
@@ -149,7 +152,7 @@ factor : prefix PA opal PC
        | prefix NUMERO
        | prefix ID
 	   | prefix funcion
-	   | '\''OTRO'\'' 
+	   | prefix LITERAL
        ;
 
 // NOT es el unico que le sigue prefix porque se pueden poner varios ! seguidos
