@@ -48,7 +48,6 @@ public class SymbolTable {
         for (int i = symbolTable.size() - 1; i >= 0; i--) {
             if (symbolTable.get(i).get(name) != null) {
                 symbolTable.get(i).get(name).setInitialized(initialized);
-                System.out.println("Inicialicé la variable " + name + " del contexto " + i);
                 return;
             }
         }     
