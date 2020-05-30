@@ -1,13 +1,5 @@
-int a = 2;
-int main() {
-    
-    double a;
-    int c;
-
-    a = 1.1;
-    c = 'a';
-    c = 7;
-
-    char x = 4;
-    
+int a;
+{
+    int a;
+    a = 2;
 }

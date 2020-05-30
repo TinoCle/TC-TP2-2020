@@ -45,17 +45,19 @@ public class Listener extends alBaseListener{
     @Override
     public void exitAsignacion(AsignacionContext ctx) {
         String idName = ctx.ID().getText();
-        if (!symbolTable.checkVariable(idName)){
+        if (symbolTable.findVariable(idName) == null){
             error.unexistentVariable(idName, ctx.getStop().getLine());
         } else{
-            ID id = symbolTable.getId(idName);
-            
-            boolean initialized = checkDataType(id.getType(), ctx.getStop().getType());
-            if (!initialized){
-                error.variableType(ctx.getStop().getLine());
-            }
-            else{
-                this.symbolTable.setInitialized(id.getName(), initialized);
+            ID id = symbolTable.findVariable(idName);
+            if (id != null){
+                boolean initialized = checkDataType(id.getType(), ctx.getStop().getType());
+                if (!initialized){
+                    error.variableType(ctx.getStop().getLine());
+                } else{
+                    this.symbolTable.setInitialized(id.getName(), initialized);
+                }
+            } else{
+                error.unexistentVariable(idName, ctx.getStop().getLine());
             }
         }
     }

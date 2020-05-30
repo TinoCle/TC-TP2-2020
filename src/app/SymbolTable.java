@@ -33,17 +33,24 @@ public class SymbolTable {
         return this.symbolTable.getLast().containsKey(name);
     }
 
-    public boolean checkVariable(String name){
-        ID id = this.symbolTable.getLast().get(name);
-        return id != null;
-    }
-
-    public ID getId(String name){
-        return this.symbolTable.getLast().get(name);
+    public ID findVariable(String name){
+        for (HashMap<String, ID> entry : this.symbolTable) {
+            for (String key : entry.keySet()) {
+                if (key.equals(name)){
+                    return entry.get(key);
+                }
+            }
+        }
+        return null;
     }
 
     public void setInitialized(String name, boolean initialized){
-        this.symbolTable.getLast().get(name).setInitialized(initialized);
+        for (int i = symbolTable.size() - 1; i >= 0; i--) {
+            if (symbolTable.get(i).get(name) != null) {
+                symbolTable.get(i).get(name).setInitialized(initialized);
+                System.out.println("Inicialicé la variable " + name + " del contexto " + i);
+                return;
+            }
+        }     
     }
-
 }
