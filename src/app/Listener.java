@@ -18,6 +18,7 @@ public class Listener extends alBaseListener{
         dataTypes.put(alLexer.NUMERO, "int");
         dataTypes.put(alLexer.FLOTANTE, "double");
         dataTypes.put(alLexer.LITERAL, "char");
+        dataTypes.put(alLexer.ID, "id");
     }
 
     @Override public void enterBloque(alParser.BloqueContext ctx) {
@@ -37,7 +38,7 @@ public class Listener extends alBaseListener{
             // System.out.println("\n" + id.toString());
             symbolTable.insertID(ctx.ID().getText(), id);    
         }
-        if (id.isInitialized() && !checkDataType(id.getType(), ctx.getStop().getType())) {
+        if (id.isInitialized() && !checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText())) {
             error.variableType(ctx.getStop().getLine());
         }
     }
@@ -50,7 +51,8 @@ public class Listener extends alBaseListener{
         } else{
             ID id = symbolTable.findVariable(idName);
             if (id != null){
-                boolean initialized = checkDataType(id.getType(), ctx.getStop().getType());
+                boolean initialized = checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText());
+                System.out.println("GET STOP:" + ctx.getStop().getText());
                 if (!initialized){
                     error.variableType(ctx.getStop().getLine());
                 } else{
@@ -63,8 +65,12 @@ public class Listener extends alBaseListener{
     }
 
 
-    private boolean checkDataType(String variableType, int dataType){
+    private boolean checkDataType(String variableType, int dataType, String name){
         System.out.println("Asigning " + dataTypes.get(dataType) + " to a " + variableType + " variable.");
+        if (dataTypes.get(dataType) == "id"){
+            ID id = symbolTable.findVariable(name);
+            return id.getType().equals(variableType);
+        }
         return dataTypes.get(dataType).equals(variableType);
     }
     
