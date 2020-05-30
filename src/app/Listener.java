@@ -22,23 +22,21 @@ public class Listener extends alBaseListener{
     }
 
     @Override public void enterBloque(alParser.BloqueContext ctx) {
-        this.symbolTable.addContext();       
+        this.symbolTable.addContext();
     }
 
     @Override public void exitBloque(alParser.BloqueContext ctx) {
-        this.symbolTable.removeContext();       
+        this.symbolTable.removeContext();
     }
     
     @Override public void exitDeclaracion(alParser.DeclaracionContext ctx) {
         ID id = new ID(ctx.tipodato().getText(), ctx.ID().getText(), ctx.asign() != null);
-        if (this.symbolTable.checkVariableDeclared(id.getName())){
+        if (!this.symbolTable.checkVariableDeclared(id.getName())) { // unexistent variable?
+            symbolTable.insertID(ctx.ID().getText(), id);
+        } else {
             error.existentVariable(id.getName(), ctx.getStop().getLine());
-        }else{
-            // System.out.println("getStop getType: " + ctx.getStop().getType());
-            // System.out.println("\n" + id.toString());
-            symbolTable.insertID(ctx.ID().getText(), id);    
         }
-        if (id.isInitialized() && !checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText())) {
+        if (id.isInitialized() && !checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText())) { // types missmatch?
             error.variableType(ctx.getStop().getLine());
         }
     }
@@ -47,28 +45,25 @@ public class Listener extends alBaseListener{
     public void exitAsignacion(AsignacionContext ctx) {
         String idName = ctx.ID().getText();
         ID id = symbolTable.findVariable(idName);
-        if (id == null){
-            error.unexistentVariable(idName, ctx.getStop().getLine());
-        } else{
-            boolean initialized = checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText());
-            if (!initialized){
+        if (id != null){ // variable exists?
+            if (checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText())){ // types match?
+                this.symbolTable.setInitialized(id.getName(), true);
+            } else {
                 error.variableType(ctx.getStop().getLine());
-            } else{
-                this.symbolTable.setInitialized(id.getName(), initialized);
             }
+        } else {
+            error.unexistentVariable(idName, ctx.getStop().getLine());
         }
     }
 
 
-    private boolean checkDataType(String variableType, int dataType, String name){
-        if (dataTypes.get(dataType) == "id"){
-            ID id = symbolTable.findVariable(name);
+    private boolean checkDataType(String variableType, int dataType, String name) {
+        if (dataTypes.get(dataType).equals("id")) {
             // System.out.println("Asigning " + id.getType() + " to a " + variableType + " variable.");
-            return id.getType().equals(variableType);
+            return symbolTable.findVariable(name).getType().equals(variableType);
         }
         // System.out.println("Asigning " + dataTypes.get(dataType) + " to a " + variableType + " variable.");
         return dataTypes.get(dataType).equals(variableType);
     }
-    
 
 }
