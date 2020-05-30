@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class Listener extends alBaseListener{ 
 
     SymbolTable symbolTable = new SymbolTable();
-    ErrorMessages error = new ErrorMessages();
+    ErrorReporter error = ErrorReporter.getInstance();
     HashMap<Integer, String> dataTypes = new HashMap<>();
 
     public Listener() {
@@ -36,7 +36,7 @@ public class Listener extends alBaseListener{
         } else {
             error.existentVariable(id.getName(), ctx.getStop().getLine());
         }
-        if (id.isInitialized() && !checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText())) { // types missmatch?
+        if (id.isInitialized() && !checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText(), ctx.getStop().getLine())) { // types missmatch?
             error.variableType(ctx.getStop().getLine());
         }
     }
@@ -46,7 +46,7 @@ public class Listener extends alBaseListener{
         String idName = ctx.ID().getText();
         ID id = symbolTable.findVariable(idName);
         if (id != null){ // variable exists?
-            if (checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText())){ // types match?
+            if (checkDataType(id.getType(), ctx.getStop().getType(), ctx.getStop().getText(), ctx.getStop().getLine())){ // types match?
                 this.symbolTable.setInitialized(id.getName(), true);
             } else {
                 error.variableType(ctx.getStop().getLine());
@@ -57,10 +57,19 @@ public class Listener extends alBaseListener{
     }
 
 
-    private boolean checkDataType(String variableType, int dataType, String name) {
+    private boolean checkDataType(String variableType, int dataType, String name, Integer line) {
         if (dataTypes.get(dataType).equals("id")) {
+            ID id = symbolTable.findVariable(name);
+            if (id != null) { // second variable exists?
+                if (!id.isInitialized()) { // second variable uninitialized?
+                    error.usingUnasignedVariable(line, name);
+                }
+                return id.getType().equals(variableType);
+            } else {
+                error.unexistentVariable(name, line);
+                return true; // no type missmatching
+            }
             // System.out.println("Asigning " + id.getType() + " to a " + variableType + " variable.");
-            return symbolTable.findVariable(name).getType().equals(variableType);
         }
         // System.out.println("Asigning " + dataTypes.get(dataType) + " to a " + variableType + " variable.");
         return dataTypes.get(dataType).equals(variableType);
