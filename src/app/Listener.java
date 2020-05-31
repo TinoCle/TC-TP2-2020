@@ -27,15 +27,13 @@ public class Listener extends alBaseListener{
     
     @Override public void exitDeclaracion(alParser.DeclaracionContext ctx) {
         ID id;
-        if (ctx.asignacion() == null) { // just declaration
+        if (ctx.asignacion() == null) { // just declaration, asignation also inserts the ID into symbolTable
             id = new ID(ctx.tipodato().getText(), ctx.ID().getText());
-        } else {
-            id = new ID(ctx.tipodato().getText(), ctx.asignacion().ID().getText());
-        }
-        if (!this.symbolTable.checkVariableDeclared(id)) { // new variable
-            symbolTable.insertID(id);
-        } else {
-            error.existentVariable(ctx.getStop().getLine(), id.getName());
+            if (!this.symbolTable.checkVariableDeclared(id)) { // new variable
+                symbolTable.insertID(id);
+            } else {
+                error.existentVariable(ctx.getStop().getLine(), id.getName());
+            }
         }
     }
 
@@ -44,34 +42,58 @@ public class Listener extends alBaseListener{
         this.checkAsignacion(ctx);
     }
 
+    private String getDeclaredVariableName(String type, String string) {
+        String returned = "";
+        for (int i = type.length(); i<string.length(); i++) {
+            if (string.charAt(i) == '=') {
+                break;
+            }
+            returned += string.charAt(i);
+        }
+        return returned;
+    }
+
     private void checkAsignacion(AsignacionContext ctx) {
-        ID leftId = symbolTable.findVariable(ctx.ID().getText());
+        ID leftID = symbolTable.findVariable(ctx.ID().getText());
+        if (ctx.getParent().getStart().getType() != alLexer.ID) { // comming from 'declaracion', build leftID
+            String leftIdName = this.getDeclaredVariableName(
+                ctx.getParent().getStart().getText(),
+                ctx.getParent().getText()
+            );
+            leftID = new ID(ctx.getParent().getStart().getText(), leftIdName);
+            if (!this.symbolTable.checkVariableDeclared(leftID)) { // new variable
+                symbolTable.insertID(leftID);
+            } else {
+                error.existentVariable(ctx.getStop().getLine(), leftID.getName());
+            }
+        }
         int type = ctx.getStop().getType();
         int line = ctx.getStop().getLine();
-        if (leftId == null) { // left ID doesn't exists
+        if (leftID == null) { // left ID doesn't exists
             error.unexistentVariable(line, ctx.ID().getText());
             return;
         }
         if (dataTypes.get(type).equals("id")) { // trying to asign variable
-            ID rightId = this.symbolTable.findVariable(ctx.getStop().getText());
-            if (rightId != null) { // right ID exists
-                if (!rightId.isInitialized()) { // right ID is uninitialized
+            ID rightID = this.symbolTable.findVariable(ctx.getStop().getText());
+            if (rightID != null) { // right ID exists
+                if (!rightID.isInitialized()) { // right ID is uninitialized
                     error.usingUninitializedVariable(line, ctx.getStop().getText());
                 }
-                if (leftId.getType().equals(rightId.getType())) { // variables with same type
-                    leftId.setValue(rightId.getValue());
-                    this.symbolTable.updateId(leftId);
+                if (leftID.getType().equals(rightID.getType())) { // variables with same type
+                    leftID.setValue(rightID.getValue());
+                    System.out.println(leftID.getName() + " = " + leftID.getValue());
+                    this.symbolTable.updateId(leftID);
                 } else {
                     error.variableType(line);
                 }
             } else {
                 error.unexistentVariable(line, ctx.getStop().getText());
             }
-        } else if (!dataTypes.get(type).equals(leftId.getType())) { // trying to set some value and missmatching its type
+        } else if (!dataTypes.get(type).equals(leftID.getType())) { // trying to set some value and missmatching its type
             error.variableType(line);
         } else { //set value
-            leftId.setValue(Integer.parseInt(ctx.getStop().getText()));
-            symbolTable.updateId(leftId);
+            leftID.setValue(Integer.parseInt(ctx.getStop().getText()));
+            symbolTable.updateId(leftID);
         }
     }
 
