@@ -1,42 +1,58 @@
 package app;
-
 public class ID {
     private String type;
     private String name;
     private boolean used;
-    private boolean initialized;
+    private Integer value;
 
-    public ID(String type, String name, Boolean initialized) {
+    public ID() { }
+
+    public ID(String type, String name) {
         this.type = type;
         this.name = name;
-        this.initialized = initialized;
         this.used = false;
-    }
-
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
+        this.value = null;
     }
 
     @Override
     public String toString() {
-        return "\nID Found\nName: " + name + "\nType: " + type + "\nInitialized: " + initialized;
+        return "\n=== ID ===\nName:\t" + name + "\nType:\t" + type + "\nValue:\t" + value;
     }
 
-    public String getType(){
+    public String getType() {
         return this.type;
     }
 
-    public String getName(){
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getName() {
         return this.name;
     }
 
-    public boolean isInitialized(){
-        return this.initialized;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public boolean isUsed(){
+    public boolean isInitialized() {
+        return this.value != null;
+    }
+
+    public boolean isUsed() {
         return this.used;
     }
 
+    public void setUsed(boolean used) {
+        this.used = used;
+    }
+
+    public Integer getValue() {
+        return this.value;
+    }
+
+    public void setValue(Integer value) {
+        this.value = value;
+    }
 
 }

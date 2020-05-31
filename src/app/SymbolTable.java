@@ -3,17 +3,13 @@ package app;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-// import org.antlr.v4.runtime.ParserRuleContext;
-// import org.antlr.v4.runtime.tree.ErrorNode;
-// import org.antlr.v4.runtime.tree.TerminalNode;
-
 public class SymbolTable { 
 
     private LinkedList<HashMap<String, ID>> symbolTable;
 
     public SymbolTable() {
         symbolTable = new LinkedList<HashMap<String, ID>>();
-        addContext();
+        addContext(); // global context
     }
 
     public void addContext() {
@@ -25,12 +21,12 @@ public class SymbolTable {
         symbolTable.removeLast();
     }
 
-    public void insertID(String name, ID id) {
-        symbolTable.getLast().put(name, id);
+    public void insertID(ID id) {
+        symbolTable.getLast().put(id.getName(), id);
     }
 
-    public boolean checkVariableDeclared(String name){
-        return this.symbolTable.getLast().containsKey(name);
+    public boolean checkVariableDeclared(ID id){
+        return this.symbolTable.getLast().containsKey(id.getName());
     }
 
     public ID findVariable(String name){
@@ -44,11 +40,11 @@ public class SymbolTable {
         return null;
     }
 
-    public void setInitialized(String name, boolean initialized){
+    public void updateId(ID id){
         for (int i = symbolTable.size() - 1; i >= 0; i--) {
-            if (symbolTable.get(i).get(name) != null) {
-                symbolTable.get(i).get(name).setInitialized(initialized);
-                return;
+            if (symbolTable.get(i).get(id.getName()) != null) {
+                symbolTable.get(i).replace(id.getName(), id);
+                break;
             }
         }     
     }
