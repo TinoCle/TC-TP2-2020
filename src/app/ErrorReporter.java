@@ -14,11 +14,11 @@ public class ErrorReporter {
         return instance;
     }
 
-    public void existentVariable(String name, int line) {
+    public void existentVariable(int line, String name) {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": The variable '" + name + "' was already declared in this context." + ANSI_RESET);
     }
 
-    public void unexistentVariable(String name, int line) {
+    public void unexistentVariable(int line, String name) {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": The variable '" + name + "' wasn't declared." + ANSI_RESET);
     }
 
@@ -26,7 +26,7 @@ public class ErrorReporter {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Variable type missmatching." + ANSI_RESET);
     }
 
-    public void usingUnasignedVariable(int line, String name) {
+    public void usingUninitializedVariable(int line, String name) {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": The variable '" + name + "' is being used uninitialized." + ANSI_RESET);
     }
 }
