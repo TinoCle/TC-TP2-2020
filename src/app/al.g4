@@ -105,7 +105,7 @@ tipodato : INT
 		 ;
 
 declaracion : tipodato ID
-			| tipodato ID asign
+			| tipodato asignacion
 			;
  
 asign : EQ operacion
