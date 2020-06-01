@@ -1,6 +1,9 @@
 package app;
 
 import app.alParser.AsignacionContext;
+import app.alParser.Param_declaracionContext;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Listener extends alBaseListener{ 
@@ -95,6 +98,37 @@ public class Listener extends alBaseListener{
             leftID.setValue(Integer.parseInt(ctx.getStop().getText()));
             symbolTable.updateId(leftID);
         }
+    }
+
+    //TODO: insert function in current context
+    @Override public void exitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx) {
+        ArrayList<ID> params = new ArrayList<>();
+        Function function = new Function();
+        String type = ctx.tipodato().getText();
+        String name = ctx.ID().getText();
+        function.setType(type);
+        function.setName(name);
+        params = getParams(ctx.param_declaracion(), params);
+        function.setParams(params);
+        //symbolTable.insertID(function);
+    }
+
+    private ArrayList<ID> getParams(Param_declaracionContext ctx, ArrayList<ID> param){
+        if (ctx.param_declaracion() == null){
+            ID id = new ID();
+            id.setName(ctx.ID().getText());
+            id.setType(ctx.tipodato().getText());
+            param.add(id);
+            return param;
+        }
+        else{
+            ID id = new ID();
+            id.setName(ctx.ID().getText());
+            id.setType(ctx.tipodato().getText());
+            param.add(id);
+            return getParams(ctx.param_declaracion(), param);
+        }
+        
     }
 
 }
