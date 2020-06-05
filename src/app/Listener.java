@@ -2,6 +2,7 @@ package app;
 
 import app.alParser.AsignacionContext;
 import app.alParser.Param_declaracionContext;
+import app.alParser.Param_definicionContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ public class Listener extends alBaseListener{
     }
 
     @Override public void enterBloque(alParser.BloqueContext ctx) {
-        this.symbolTable.addContext();
+        //this.symbolTable.addContext();
     }
 
     @Override public void exitBloque(alParser.BloqueContext ctx) {
@@ -108,19 +109,14 @@ public class Listener extends alBaseListener{
         String name = ctx.ID().getText();
         function.setType(type);
         function.setName(name);
-        System.out.println(ctx.param_declaracion());
         if (ctx.param_declaracion() != null)
-            params = getParams(ctx.param_declaracion(), params);
+            params = getParamsDeclaration(ctx.param_declaracion(), params);
         function.setParams(params);
         System.out.println(function);
         //symbolTable.insertID(function);
     }
 
-    @Override public void exitDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
-        
-    }
-
-    private ArrayList<ID> getParams(Param_declaracionContext ctx, ArrayList<ID> param){
+    private ArrayList<ID> getParamsDeclaration(Param_declaracionContext ctx, ArrayList<ID> param){
         if (ctx.param_declaracion() != null) {
             ID id = new ID();
             if (ctx.ID() != null)
@@ -129,7 +125,7 @@ public class Listener extends alBaseListener{
                 id.setName("");
             id.setType(ctx.tipodato().getText());
             param.add(id);
-            return getParams(ctx.param_declaracion(), param);
+            return getParamsDeclaration(ctx.param_declaracion(), param);
         } else{
             ID id = new ID();
             if (ctx.ID() != null)
@@ -141,4 +137,58 @@ public class Listener extends alBaseListener{
             return param;
         }
     }
+
+    //First I create a function context, so i can set variables in the same place
+    @Override public void enterDefinicion_funcion(alParser.Definicion_funcionContext ctx) { 
+        symbolTable.addContext();
+    }
+
+    //Then I have to add the parameters to the function context created previously
+    @Override public void exitParam_definicion(alParser.Param_definicionContext ctx) { 
+        if (ctx != null){
+            ArrayList<ID> params = new ArrayList<>();
+            params = getParamsDefinition(ctx, params);
+            for (ID id : params) {
+                symbolTable.insertID(id);
+            }
+        }
+    }
+    
+    //And finally I create the Function setting its type, parameters and name
+    @Override public void exitDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
+        Function function = new Function();
+        ArrayList<ID> params = new ArrayList<>();
+        String name = ctx.ID().getText();
+        String type = ctx.tipodato().getText();
+        function.setType(type);
+        function.setName(name);
+        //symbolTable.findVariable(name)
+        if (ctx.param_definicion() != null)
+            params = getParamsDefinition(ctx.param_definicion(), params);
+        function.setParams(params);
+        for (ID id : params) {
+            symbolTable.insertID(id);
+        }
+        System.out.println(function);
+        //symbolTable.insertID(function);
+    }
+
+    private ArrayList<ID> getParamsDefinition(Param_definicionContext ctx, ArrayList<ID> param){
+        if (ctx.param_definicion() != null) {
+            ID id = new ID();
+            id.setName(ctx.ID().getText());
+            id.setType(ctx.tipodato().getText());
+            id.setValue(1);
+            param.add(id);
+            return getParamsDefinition(ctx.param_definicion(), param);
+        } else{
+            ID id = new ID();
+            id.setName(ctx.ID().getText());
+            id.setType(ctx.tipodato().getText());
+            id.setValue(1);
+            param.add(id);
+            return param;
+        }
+    }
+
 }

@@ -40,6 +40,12 @@ public class SymbolTable {
         return null;
     }
 
+    /* 
+    public Function findFunction(String name){
+        return this.symbolTable.getLast().get(name);
+    } 
+    */
+
     public void updateId(ID id){
         for (int i = symbolTable.size() - 1; i >= 0; i--) {
             if (symbolTable.get(i).get(id.getName()) != null) {
