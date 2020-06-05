@@ -1,4 +1,4 @@
-// Generated from /home/agustin/Desktop/Facultad/Técnicas de Compilación/Proyectos/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
+// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
 
     package app;
 
@@ -97,6 +97,18 @@ public class alBaseListener implements alListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitParam_declaracion(alParser.Param_declaracionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDefinicion_funcion(alParser.Definicion_funcionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDefinicion_funcion(alParser.Definicion_funcionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

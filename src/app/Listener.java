@@ -100,7 +100,7 @@ public class Listener extends alBaseListener{
         }
     }
 
-    //TODO: insert function in current context
+    //TODO: insert function in current and check if it's the global context, if not show error
     @Override public void exitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx) {
         ArrayList<ID> params = new ArrayList<>();
         Function function = new Function();
@@ -108,27 +108,37 @@ public class Listener extends alBaseListener{
         String name = ctx.ID().getText();
         function.setType(type);
         function.setName(name);
-        params = getParams(ctx.param_declaracion(), params);
+        System.out.println(ctx.param_declaracion());
+        if (ctx.param_declaracion() != null)
+            params = getParams(ctx.param_declaracion(), params);
         function.setParams(params);
+        System.out.println(function);
         //symbolTable.insertID(function);
     }
 
+    @Override public void exitDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
+        
+    }
+
     private ArrayList<ID> getParams(Param_declaracionContext ctx, ArrayList<ID> param){
-        if (ctx.param_declaracion() == null){
+        if (ctx.param_declaracion() != null) {
             ID id = new ID();
-            id.setName(ctx.ID().getText());
+            if (ctx.ID() != null)
+                id.setName(ctx.ID().getText());
+            else
+                id.setName("");
+            id.setType(ctx.tipodato().getText());
+            param.add(id);
+            return getParams(ctx.param_declaracion(), param);
+        } else{
+            ID id = new ID();
+            if (ctx.ID() != null)
+                id.setName(ctx.ID().getText());
+            else
+                id.setName("");
             id.setType(ctx.tipodato().getText());
             param.add(id);
             return param;
         }
-        else{
-            ID id = new ID();
-            id.setName(ctx.ID().getText());
-            id.setType(ctx.tipodato().getText());
-            param.add(id);
-            return getParams(ctx.param_declaracion(), param);
-        }
-        
     }
-
 }

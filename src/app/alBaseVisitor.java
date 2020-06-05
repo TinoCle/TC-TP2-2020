@@ -1,4 +1,4 @@
-// Generated from /home/agustin/Desktop/Facultad/Técnicas de Compilación/Proyectos/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
+// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
 
     package app;
 
@@ -62,6 +62,13 @@ public class alBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements alV
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitParam_declaracion(alParser.Param_declaracionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitDefinicion_funcion(alParser.Definicion_funcionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

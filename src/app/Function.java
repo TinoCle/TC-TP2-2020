@@ -22,9 +22,14 @@ public class Function {
     @Override
     public String toString() {
         String function = "\n=== Function ===\nName:\t" + name + "\nType:\t" + type;
+        function += "\nParams {";
         for (ID id : params) {
-            function += "\nParam:\n\tName: "+ id.getName() + "\n\tType: " + id.getType();
+            if (!id.getName().isEmpty())
+                function += "\n\n\tName: "+ id.getName() + "\n\tType: " + id.getType();    
+            else
+                function += "\n\n\tType: " + id.getType();
         }
+        function += "\n}";
         return function;
     }
 
@@ -63,9 +68,4 @@ public class Function {
     public void addParam(ID id) {
         this.params.add(id);
     }
-
-    
-
-    
-
 }

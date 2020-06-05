@@ -1,4 +1,4 @@
-// Generated from /home/agustin/Desktop/Facultad/Técnicas de Compilación/Proyectos/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
+// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
 
     package app;
 
@@ -79,6 +79,16 @@ public interface alListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParam_declaracion(alParser.Param_declaracionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link alParser#definicion_funcion}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefinicion_funcion(alParser.Definicion_funcionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link alParser#definicion_funcion}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefinicion_funcion(alParser.Definicion_funcionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link alParser#param_definicion}.
 	 * @param ctx the parse tree

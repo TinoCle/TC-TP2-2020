@@ -1,4 +1,4 @@
-// Generated from /home/agustin/Desktop/Facultad/Técnicas de Compilación/Proyectos/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
+// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
 
     package app;
 
@@ -54,6 +54,12 @@ public interface alVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParam_declaracion(alParser.Param_declaracionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link alParser#definicion_funcion}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDefinicion_funcion(alParser.Definicion_funcionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link alParser#param_definicion}.
 	 * @param ctx the parse tree

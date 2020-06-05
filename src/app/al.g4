@@ -14,10 +14,10 @@ PA : '(' ;
 PC : ')' ; 
 
 CA : '[' ;
-CC : ']' ;
+CC : ']' ; 
 
 LA : '{' ;
-LC : '}' ;
+LC : '}' ; 
 
 PYC 	: ';' 	   ;
 COMA    : ','	   ;
@@ -68,7 +68,8 @@ balance : PA balance PC balance
 
 instruccion : declaracion PYC
             | asignacion PYC
-			| declaracion_funcion
+			| declaracion_funcion PYC
+			| definicion_funcion
 			| funcion PYC
 			| condicional
 			| iteracion
@@ -78,13 +79,15 @@ instruccion : declaracion PYC
 // int sum (int ,int);
 // int sum (int x, int y);
 // int sum (int x, int y){}
-declaracion_funcion : tipodato ID PA param_declaracion? PC PYC
-					| tipodato ID PA param_definicion?  PC bloque
+declaracion_funcion : tipodato ID PA param_declaracion? PC
 					;
-
+  
 param_declaracion : tipodato (ID | )
 		   		  | tipodato (ID | ) COMA param_declaracion
 		   		  ;
+
+definicion_funcion: tipodato ID PA param_definicion?  PC bloque
+				  ;
 
 param_definicion : tipodato ID
 			     | tipodato ID COMA param_definicion
