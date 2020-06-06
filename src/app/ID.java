@@ -1,17 +1,20 @@
 package app;
-public class ID {
+
+public abstract class ID {
     private String type;
     private String name;
     private boolean used;
     private Integer value;
 
-    public ID() { }
+    public ID() {
+
+    }
 
     public ID(String type, String name) {
         this.type = type;
         this.name = name;
-        this.used = false;
         this.value = null;
+        this.used = false;
     }
 
     @Override

@@ -28,4 +28,9 @@ public class ErrorReporter {
     public void usingUninitializedVariable(int line, String name) {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": The variable '" + name + "' is being used uninitialized." + ANSI_RESET);
     }
+
+    public void functionNotDeclaredGlobalContext(int line){
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Function Not Declared in Glogal Context" + ANSI_RESET);
+    }
+
 }

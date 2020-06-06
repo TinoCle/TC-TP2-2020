@@ -2,10 +2,7 @@ package app;
 
 import java.util.ArrayList;
 
-public class Function {
-    private String type;
-    private String name;
-    private boolean used;
+public class Function extends ID{
     private ArrayList<ID> params;
 
     public Function() {
@@ -13,15 +10,13 @@ public class Function {
     }
 
     public Function(String type, String name) {
+        super();
         this.params = new ArrayList<ID>();
-        this.type = type;
-        this.name = name;
-        this.used = false;
     }
 
     @Override
     public String toString() {
-        String function = "\n=== Function ===\nName:\t" + name + "\nType:\t" + type;
+        String function = "\n=== Function ===\nName:\t" + getName() + "\nType:\t" + this.getType();
         function += "\nParams {";
         for (ID id : params) {
             if (!id.getName().isEmpty())
@@ -31,30 +26,6 @@ public class Function {
         }
         function += "\n}";
         return function;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isUsed() {
-        return used;
-    }
-
-    public void setUsed(boolean used) {
-        this.used = used;
     }
 
     public ArrayList<ID> getParams() {

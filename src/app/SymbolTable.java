@@ -54,4 +54,9 @@ public class SymbolTable {
             }
         }     
     }
+
+    public int getContext(){
+        return this.symbolTable.size();
+    }
+
 }
