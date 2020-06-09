@@ -28,6 +28,22 @@ public class Function extends ID{
         return function;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        Function prototype = (Function) obj;
+        if (this.params.size() != prototype.getParams().size())
+            return false;
+        else{
+            for (int i = 0; i < this.params.size(); i++) {
+                if (!this.params.get(i).getType().equals(prototype.getParams().get(i).getType())){
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+    }
+
     public ArrayList<ID> getParams() {
         return params;
     }

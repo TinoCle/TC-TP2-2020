@@ -5,6 +5,8 @@ import app.alParser.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.antlr.v4.runtime.misc.Interval;
+
 public class Listener extends alBaseListener{ 
 
     SymbolTable symbolTable = new SymbolTable();
@@ -112,45 +114,52 @@ public class Listener extends alBaseListener{
         }
     }
 
-    //TODO: insert function in current and check if it's the global context, if not show error
     @Override public void exitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx) {
         ArrayList<ID> params = new ArrayList<>();
+        boolean ok = true;
         Function function = new Function();
         String type = ctx.tipodato().getText();
         String name = ctx.ID().getText();
         function.setType(type);
         function.setName(name);
-        if (ctx.param_declaracion() != null)
-            params = getParamsDeclaration(ctx.param_declaracion(), params);
-            for (ID id : params) {
-                if (this.symbolTable.checkVariableDeclared(id))
-                    error.existentVariable(ctx.getStart().getLine(), id.getName());
-                symbolTable.insertID(id);
-            }
-        function.setParams(params);
-        if (this.symbolTable.getContext() != 1){ //if not global context
+
+        if (this.symbolTable.getFunctionPrototype(function) != null){
+            error.existentFunction(ctx.getStart().getLine(), function.getName());
+            ok = false;
+        } else if (this.symbolTable.getContext() != 1){ //if not global context
             error.functionNotDeclaredGlobalContext(ctx.getStart().getLine());
-        } else{
+            ok = false;
+        } else if (this.symbolTable.checkVariableDeclared(function)){
+            error.existentVariable(ctx.getStart().getLine(), function.getName());
+            ok = false;
+        }
+
+        if (ok){
+            if (ctx.param_declaracion() != null) {
+                params = getParamsDeclaration(ctx.param_declaracion(), params);
+                for (ID id : params) {
+                    if (!id.getName().equals(""))
+                        if (this.symbolTable.checkVariableDeclared(id))
+                            error.existentVariable(ctx.getStart().getLine(), id.getName());
+                    symbolTable.insertID(id);
+                }
+            }
+            function.setParams(params);
             symbolTable.insertID(function);
         }
+        
     }
 
     private ArrayList<ID> getParamsDeclaration(Param_declaracionContext ctx, ArrayList<ID> param){
         if (ctx.param_declaracion() != null) {
             ID id = new Variable();
-            if (ctx.ID() != null)
-                id.setName(ctx.ID().getText());
-            else
-                id.setName("");
+            id.setName(ctx.ID() != null ? ctx.ID().getText() : "");
             id.setType(ctx.tipodato().getText());
             param.add(id);
             return getParamsDeclaration(ctx.param_declaracion(), param);
         } else{
             ID id = new Variable();
-            if (ctx.ID() != null)
-                id.setName(ctx.ID().getText());
-            else
-                id.setName("");
+            id.setName(ctx.ID() != null ? ctx.ID().getText() : "");
             id.setType(ctx.tipodato().getText());
             param.add(id);
             return param;
@@ -162,7 +171,7 @@ public class Listener extends alBaseListener{
         symbolTable.addContext();
     }
     
-    //And finally I create the Function setting its type, parameters and name
+    //And then I create the Function setting its type, parameters and name
     @Override public void exitDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
         Function function = new Function();
         ArrayList<ID> params = new ArrayList<>();
@@ -170,11 +179,15 @@ public class Listener extends alBaseListener{
         String name = ctx.ID().getText();
         function.setType(type);
         function.setName(name);
-        //symbolTable.findVariable(name)
         if (ctx.param_definicion() != null)
             params = getParamsDefinition(ctx.param_definicion(), params);
         function.setParams(params);
-        System.out.println(function);
+        if (this.symbolTable.getContext() == 1){
+            Function prototype = this.symbolTable.getFunctionPrototype(function);
+            if (!function.equals(prototype)){
+                error.conflictingTypes(ctx.getStart().getLine(), function.getName());
+            }
+        }
         symbolTable.insertID(function);
     }
 

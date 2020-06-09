@@ -17,6 +17,14 @@ public class ErrorReporter {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": The variable '" + name + "' was already declared in this context." + ANSI_RESET);
     }
 
+    public void existentFunction(int line, String name) {
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Function prototype '" + name + "' already declared." + ANSI_RESET);
+    }
+
+    public void conflictingTypes(int line, String name){
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Conflicting types for '" + name + "'" + ANSI_RESET);
+    }
+
     public void unexistentVariable(int line, String name) {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": The variable '" + name + "' wasn't declared." + ANSI_RESET);
     }

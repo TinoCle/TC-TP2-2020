@@ -40,11 +40,18 @@ public class SymbolTable {
         return null;
     }
 
-    /* 
-    public Function findFunction(String name){
+    public Function getFunctionPrototype(Function function){
+        ID idFound = this.symbolTable.getFirst().get(function.getName());
+        if (idFound instanceof Function){
+            return (Function) idFound;
+        } else{
+            return null;
+        }
+    }
+
+    /* public Function findFunction(String name){
         return this.symbolTable.getLast().get(name);
-    } 
-    */
+    } */
 
     public void updateId(ID id){
         for (int i = symbolTable.size() - 1; i >= 0; i--) {
