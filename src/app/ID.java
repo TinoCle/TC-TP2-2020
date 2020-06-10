@@ -4,7 +4,7 @@ public abstract class ID {
     private String type;
     private String name;
     private boolean used;
-    private Integer value;
+    private String value;
 
     public ID() {
 
@@ -50,11 +50,11 @@ public abstract class ID {
         this.used = used;
     }
 
-    public Integer getValue() {
+    public String getValue() {
         return this.value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
