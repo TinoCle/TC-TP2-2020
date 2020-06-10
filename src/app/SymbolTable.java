@@ -90,4 +90,15 @@ public class SymbolTable {
         return this.symbolTable.size();
     }
 
+    public LinkedList<ID> getCurrentContextUnusedVariables() {
+        LinkedList<ID> unused = new LinkedList<ID>();
+        HashMap<String, ID> IDs = this.symbolTable.getLast();
+        for(ID id : IDs.values()) {
+            if (!id.isUsed()) {
+                unused.add(id);
+            }
+        }
+        return unused;
+    }
+
 }

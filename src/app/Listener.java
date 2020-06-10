@@ -46,7 +46,7 @@ public class Listener extends alBaseListener {
 
     @Override
     public void exitBloque(alParser.BloqueContext ctx) {
-        // this.symbolTable.printSymboltable2();
+        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables());
         this.symbolTable.removeContext();
     }
 
@@ -203,7 +203,6 @@ public class Listener extends alBaseListener {
 
     //First I create a function context, so i can set variables in the same place
     @Override public void enterDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
-        System.out.println("ENTRANDO EN DEFINICION DE FUNCION");
         symbolTable.addContext();
     }
     
@@ -288,7 +287,8 @@ public class Listener extends alBaseListener {
 
 
     @Override public void exitProg(alParser.ProgContext ctx) {
-        //symbolTable.printSymboltable();
+        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables());
+        symbolTable.printSymboltable();
         this.symbolTable.removeContext();
     }
 
