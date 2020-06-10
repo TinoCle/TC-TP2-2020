@@ -29,7 +29,7 @@ public class Function extends ID{
                 function += " " + id.getName();
             }
         }
-        if (isUsed()) {
+        if (isUsed() || getName().equals("main")) {
             function += ") (used)";
         } else {
             function += ") (unused)";
