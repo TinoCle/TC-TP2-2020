@@ -91,6 +91,10 @@ public class SymbolTable {
         return this.symbolTable.size();
     }
 
+    public int getHistoricContext() {
+        return this.historicSymbolTable.size();
+    }
+
     public LinkedList<ID> getCurrentContextUnusedVariables() {
         LinkedList<ID> unused = new LinkedList<ID>();
         HashMap<String, ID> IDs = this.symbolTable.getLast();

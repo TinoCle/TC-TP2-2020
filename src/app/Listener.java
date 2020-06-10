@@ -46,7 +46,7 @@ public class Listener extends alBaseListener {
 
     @Override
     public void exitBloque(alParser.BloqueContext ctx) {
-        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables());
+        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables(), symbolTable.getHistoricContext());
         this.symbolTable.removeContext();
     }
 
@@ -339,7 +339,7 @@ public class Listener extends alBaseListener {
     }
  
     @Override public void exitProg(alParser.ProgContext ctx) {
-        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables());
+        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables(), symbolTable.getHistoricContext());
         if (!error.codeWithErrors) { // we print the entire symbol table only if there were no errors
             symbolTable.printSymboltable();
         }

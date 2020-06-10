@@ -92,7 +92,7 @@ public class ErrorReporter {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": missmatching type ‘return’ in function" + ANSI_RESET);
     }
 
-    public void unusedVariables(LinkedList<ID> unused) {
+    public void unusedVariables(LinkedList<ID> unused, int context) {
         for (ID id : unused) {
             String error = ANSI_YELLOW + "WARNING\tThe ";
             System.out.println();
@@ -101,7 +101,7 @@ public class ErrorReporter {
             } else {
                 error += "function ";
             }
-            error +=  id.getName() + " wasn't used." + ANSI_RESET;
+            error +=  id.getName() + " wasn't used in context " + context + "." + ANSI_RESET;
             System.out.println(error);
         }
     }
