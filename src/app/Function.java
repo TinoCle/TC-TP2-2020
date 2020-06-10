@@ -14,18 +14,21 @@ public class Function extends ID{
         this.params = new ArrayList<ID>();
     }
 
+
     @Override
     public String toString() {
-        String function = "\n=== Function ===\nName:\t" + getName() + "\nType:\t" + this.getType();
-        function += "\nParams {";
+        String function = getType() + " " + getName() + "(";
+        int i = 0;
         for (ID id : params) {
-            if (!id.getName().isEmpty())
-                function += "\n\n\tName: "+ id.getName() + "\n\tType: " + id.getType();    
-            else
-                function += "\n\n\tType: " + id.getType();
+            if (i++ != 0) {
+                function += ", ";
+            }
+            function += id.getType();
+            if (!id.getName().isEmpty()) {
+                function += " " + id.getName();
+            }
         }
-        function += "\n}";
-        return function;
+        return function += ")";
     }
 
     @Override
