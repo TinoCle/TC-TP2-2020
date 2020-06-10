@@ -25,6 +25,7 @@ public class SymbolTable {
     }
 
     public void insertID(ID id) {
+        // System.out.println("Insertando " + id.getName() + " en el contexto " + symbolTable.size());
         symbolTable.getLast().put(id.getName(), id);
         historicSymbolTable.getLast().put(id.getName(), id);
     }
@@ -48,6 +49,7 @@ public class SymbolTable {
         for (HashMap<String, ID> entry : this.symbolTable) {
             for (String key : entry.keySet()) {
                 if (key.equals(name)){
+                    setUsed(name);
                     return entry.get(key);
                 }
             }
@@ -57,9 +59,9 @@ public class SymbolTable {
 
     public void setUsed(String name){
         for (HashMap<String, ID> entry : this.symbolTable) {
-            for (String key : entry.keySet()) {
-                if (key.equals(name)){
-                    
+            for (ID id : entry.values()) {
+                if (id.getName().equals(name)) {
+                    id.setUsed(true);
                 }
             }
         }

@@ -28,7 +28,12 @@ public class Function extends ID{
                 function += " " + id.getName();
             }
         }
-        return function += ")";
+        if (isUsed()) {
+            function += ") (used)";
+        } else {
+            function += ") (unused)";
+        }
+        return function;
     }
 
     @Override
