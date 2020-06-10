@@ -70,6 +70,16 @@ public interface alListener extends ParseTreeListener {
 	 */
 	void exitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link alParser#retornar}.
+	 * @param ctx the parse tree
+	 */
+	void enterRetornar(alParser.RetornarContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link alParser#retornar}.
+	 * @param ctx the parse tree
+	 */
+	void exitRetornar(alParser.RetornarContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link alParser#param_declaracion}.
 	 * @param ctx the parse tree
 	 */

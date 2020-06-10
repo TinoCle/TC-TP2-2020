@@ -60,7 +60,7 @@ instrucciones : instruccion instrucciones
 
 bloque : LA instrucciones LC
 	   ;
-
+ 
 balance : PA balance PC balance
 		| LA balance LC balance
 		| CA balance CC balance
@@ -83,14 +83,14 @@ instruccion : declaracion PYC
 // int sum (int x, int y){}
 declaracion_funcion : tipodato ID PA param_declaracion? PC
 					;
-  
-retornar : RETURN factor;
+
+retornar : RETURN (factor | );
 
 param_declaracion : tipodato (ID | )
 		   		  | tipodato (ID | ) COMA param_declaracion
 		   		  ;
 
-definicion_funcion: tipodato ID PA param_definicion?  PC bloque
+definicion_funcion: tipodato ID PA param_definicion? PC bloque
 				  ;
 
 param_definicion : tipodato ID

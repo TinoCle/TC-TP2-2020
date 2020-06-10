@@ -90,6 +90,18 @@ public class alBaseListener implements alListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRetornar(alParser.RetornarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRetornar(alParser.RetornarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterParam_declaracion(alParser.Param_declaracionContext ctx) { }
 	/**
 	 * {@inheritDoc}

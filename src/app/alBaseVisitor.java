@@ -61,6 +61,13 @@ public class alBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements alV
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitRetornar(alParser.RetornarContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitParam_declaracion(alParser.Param_declaracionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

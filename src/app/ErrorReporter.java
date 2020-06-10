@@ -53,12 +53,29 @@ public class ErrorReporter {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Expected declaration or statement at end of input" + ANSI_RESET);
     }
 
+    
     public void usingUninitializedVariable(int line, String name) {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": The variable '" + name + "' is being used uninitialized." + ANSI_RESET);
     }
-
+    
     public void functionNotDeclaredInGlobalContext(int line){
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": The function prototype must be in the glogal context" + ANSI_RESET);
+    }
+    
+    public void returnOutsideFunction(int line){
+        System.out.println(ANSI_RED + "SyntaxError\tLine " + line+ ": ‘return’ outside function" + ANSI_RESET);
+    }
+
+    public void returnValueVoid(int line){
+        System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": ‘return’ with a value, in function returning void" + ANSI_RESET);
+    }
+
+    public void returnNoValueNonVoid(int line){
+        System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": ‘return’ with no value, in function returning non-void" + ANSI_RESET);
+    }
+
+    public void missmatchingReturnType(int line){
+        System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": missmatching type ‘return’ in function" + ANSI_RESET);
     }
 
 }

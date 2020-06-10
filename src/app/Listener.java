@@ -203,7 +203,6 @@ public class Listener extends alBaseListener {
 
     //First I create a function context, so i can set variables in the same place
     @Override public void enterDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
-        System.out.println("ENTRANDO EN DEFINICION DE FUNCION");
         symbolTable.addContext();
     }
     
@@ -225,7 +224,6 @@ public class Listener extends alBaseListener {
                 error.conflictingTypes(ctx.getStart().getLine(), function.getName());
             }
         }
-
         symbolTable.insertID(function);
     }
 
@@ -278,15 +276,68 @@ public class Listener extends alBaseListener {
         }
     }
 
-    @Override public void exitRetornar(alParser.RetornarContext ctx) {
-        if (ctx.getParent() instanceof Definicion_funcionContext){
-
+    @Override public void exitRetornar(alParser.RetornarContext ctx) {        
+        Definicion_funcionContext fnCtx = findFunction(ctx);
+        if (fnCtx != null){
+            if (fnCtx.tipodato().getText().equals("void") && ctx.factor() != null){
+                error.returnValueVoid(ctx.getStart().getLine());
+                return;
+            } else if (!fnCtx.tipodato().getText().equals("void") && ctx.factor() == null){
+                error.returnNoValueNonVoid(ctx.getStart().getLine());
+                return;
+            } else if (!compareTypes(ctx, ctx.factor())){
+                error.missmatchingReturnType(ctx.getStart().getLine());
+            }
         } else{
             error.returnOutsideFunction(ctx.getStart().getLine());
         }
     }
 
+    private boolean compareTypes (RetornarContext ctx, FactorContext factor){
+        if (factor.NUMERO() != null && ctx.factor().equals(factor)){
+            return true;
+        }
+        if (factor.FLOTANTE() != null && ctx.factor().equals(factor)){
+            return true;
+        }
+        if (factor.LITERAL() != null && ctx.factor().equals(factor)){
+            return true;
+        }
+        return false;
+        /* if (factor.funcion() != null){
+            String functionName = factor.funcion().getText();
+            Function function = (Function) symbolTable.findVariable(functionName);
+            if (ctx.factor().equals(function.getctx.factor()())) {
+                return true;
+            } else{
+                return false;
+            }
+        }
+        if (factor.ID() != null){
+            ID id = this.symbolTable.findVariable(factor.ID().getText());
+            if (id != null) { // right ID exists
+                if (type.equals(id.getType())) { // variables with same type
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                error.unexistentVariable(line, ctx.getStop().getText());
+            }
+        } */
+    }
 
+    private Definicion_funcionContext findFunction(ParseTree parseTree){
+        if (!(parseTree instanceof Definicion_funcionContext) && parseTree.getParent() != null) {
+            return findFunction (parseTree.getParent());
+        } else if (parseTree.getParent() == null){
+            return null;
+        }
+        else{
+            return (Definicion_funcionContext) parseTree;
+        }
+    }
+ 
     @Override public void exitProg(alParser.ProgContext ctx) {
         //symbolTable.printSymboltable();
         this.symbolTable.removeContext();

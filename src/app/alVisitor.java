@@ -49,6 +49,12 @@ public interface alVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link alParser#retornar}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRetornar(alParser.RetornarContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link alParser#param_declaracion}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
