@@ -36,6 +36,7 @@ public class SymbolTable {
 
     public void printSymboltable() {
         int ctx = 1;
+        System.out.println("\n=== SYMBOL TABLE ===");
         for (HashMap<String, ID> entry : this.historicSymbolTable) {
             System.out.println("Contexto: " + ctx++ + " {");
             for(ID id : entry.values()) {
