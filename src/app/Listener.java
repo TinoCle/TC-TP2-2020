@@ -81,7 +81,7 @@ public class Listener extends alBaseListener {
                 error.existentVariable(ctx.getStop().getLine(), leftID.getName());
             }
         }
-        ArrayList<FactorContext> factores = getFactor(ctx);
+        ArrayList<FactorContext> factores = getFactors(ctx);
         if (leftID == null) { // left ID doesn't exists
             error.unexistentVariable(line, ctx.ID().getText());
             return;
@@ -90,7 +90,6 @@ public class Listener extends alBaseListener {
             error.missingAssignment(line);
             return;
         }
-        System.out.println(leftID.getName());
         for (FactorContext factor : factores) {
             if (factor.ID() != null && !factor.ID().getText().equals(leftID.getName())){
                 ID rightID = this.symbolTable.findVariable(factor.ID().getText());
@@ -111,21 +110,28 @@ public class Listener extends alBaseListener {
                 String functionName = factor.funcion().getText();
                 Function function = (Function) symbolTable.findVariable(functionName);
                 if (function != null){
+                    leftID.setValue(functionName);
                     if (!leftID.getType().equals(function.getType())) {
                         error.variableType(line);
                     }
                 }
-            } else if (factor.NUMERO() != null || factor.FLOTANTE() != null){
+            } else if (factor.NUMERO() != null){
+                leftID.setValue(factor.NUMERO().getText());
+                if (!(leftID.getType().equals("int") || leftID.getType().equals("double"))){
+                    error.variableType(line);
+                }
+            } else if(factor.FLOTANTE() != null){
+                leftID.setValue(factor.FLOTANTE().getText());
                 if (!(leftID.getType().equals("int") || leftID.getType().equals("double"))){
                     error.variableType(line);
                 }
             } else if (factor.LITERAL() != null){
+                leftID.setValue(factor.LITERAL().getText());
                 if (!leftID.getType().equals("char")){
                     error.variableType(line);
                 }
             }
             else { // set value
-                leftID.setValue(ctx.getStop().getText());
                 symbolTable.updateId(leftID);
             }        
         }
@@ -133,7 +139,7 @@ public class Listener extends alBaseListener {
     }
 
 
-    private ArrayList<FactorContext> getFactor(ParseTree parseTree) {
+    private ArrayList<FactorContext> getFactors(ParseTree parseTree) {
         ArrayList<FactorContext> factores = new ArrayList<FactorContext>();
         for (ParseTree ctx : XPath.findAll(parseTree, "//factor", parser)) {
             factores.add((FactorContext) ctx);
@@ -219,7 +225,7 @@ public class Listener extends alBaseListener {
                 error.conflictingTypes(ctx.getStart().getLine(), function.getName());
             }
         }
-        //System.out.println("Definicion Funcion Contexto:" + this.symbolTable.getContext());
+
         symbolTable.insertID(function);
     }
 
@@ -271,6 +277,15 @@ public class Listener extends alBaseListener {
             return getParametersCount(ctx.parametros(), ++count);
         }
     }
+
+    @Override public void exitRetornar(alParser.RetornarContext ctx) {
+        if (ctx.getParent() instanceof Definicion_funcionContext){
+
+        } else{
+            error.returnOutsideFunction(ctx.getStart().getLine());
+        }
+    }
+
 
     @Override public void exitProg(alParser.ProgContext ctx) {
         //symbolTable.printSymboltable();
