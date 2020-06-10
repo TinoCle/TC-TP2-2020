@@ -25,6 +25,22 @@ public class ErrorReporter {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Conflicting types for '" + name + "'" + ANSI_RESET);
     }
 
+    public void callingNotFunction(int line, String name){
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Called object '" + name + "' is not a function or function pointer" + ANSI_RESET);
+    }
+
+    public void tooFewArguments(int line, String name){
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Too few arguments to function '" + name + "'" + ANSI_RESET);
+    }
+
+    public void tooManyArguments(int line, String name){
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Too many arguments to function '" + name + "'" + ANSI_RESET);
+    }
+
+    public void implicitDeclaration(int line, String name) {
+        System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": Implicit declaration of function '" + name + "'" + ANSI_RESET);
+    }
+
     public void unexistentVariable(int line, String name) {
         System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": The variable '" + name + "' wasn't declared." + ANSI_RESET);
     }

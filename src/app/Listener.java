@@ -5,8 +5,6 @@ import app.alParser.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.antlr.v4.runtime.misc.Interval;
-
 public class Listener extends alBaseListener{ 
 
     SymbolTable symbolTable = new SymbolTable();
@@ -184,7 +182,7 @@ public class Listener extends alBaseListener{
         function.setParams(params);
         if (this.symbolTable.getContext() == 1){
             Function prototype = this.symbolTable.getFunctionPrototype(function);
-            if (!function.equals(prototype)){
+            if (prototype != null && !function.equals(prototype)){
                 error.conflictingTypes(ctx.getStart().getLine(), function.getName());
             }
         }
@@ -206,6 +204,30 @@ public class Listener extends alBaseListener{
             id.setValue("1");
             param.add(id);
             return param;
+        }
+    }
+
+    @Override public void exitFuncion(alParser.FuncionContext ctx) {
+        String functionName = ctx.ID().getText();
+        int paramCount = getParametersCount(ctx.parametros(), 0);
+        ID function = this.symbolTable.findVariable(functionName);
+        if (function == null){
+            error.implicitDeclaration(ctx.getStart().getLine(), functionName);
+        }
+        else if (!(function instanceof Function)){
+            error.callingNotFunction(ctx.getStart().getLine(), functionName);
+        } else if (paramCount < ((Function) function).getParams().size()){
+            error.tooFewArguments(ctx.getStart().getLine(), functionName);
+        } else if (paramCount > ((Function) function).getParams().size()){
+            error.tooManyArguments(ctx.getStart().getLine(), functionName);
+        }
+    }
+
+    private int getParametersCount(ParametrosContext ctx, int count){
+        if (ctx.parametros() == null){
+            return ++count;
+        }else{
+            return getParametersCount(ctx.parametros(), ++count);
         }
     }
 
