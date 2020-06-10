@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello Java");
 
         // create a CharStream that reads from file
         CharStream input = CharStreams.fromFileName("src/app/input.txt");
