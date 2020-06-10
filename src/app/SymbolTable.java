@@ -94,6 +94,9 @@ public class SymbolTable {
         LinkedList<ID> unused = new LinkedList<ID>();
         HashMap<String, ID> IDs = this.symbolTable.getLast();
         for(ID id : IDs.values()) {
+            if (id instanceof Function && id.getName().equals("main")) { // function main is always used
+                continue;
+            }
             if (!id.isUsed()) {
                 unused.add(id);
             }
