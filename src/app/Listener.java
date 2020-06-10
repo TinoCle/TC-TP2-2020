@@ -46,7 +46,7 @@ public class Listener extends alBaseListener {
 
     @Override
     public void exitBloque(alParser.BloqueContext ctx) {
-        // this.symbolTable.printSymboltable2();
+        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables());
         this.symbolTable.removeContext();
     }
 
@@ -339,7 +339,8 @@ public class Listener extends alBaseListener {
     }
  
     @Override public void exitProg(alParser.ProgContext ctx) {
-        //symbolTable.printSymboltable();
+        error.unusedVariables(symbolTable.getCurrentContextUnusedVariables());
+        symbolTable.printSymboltable();
         this.symbolTable.removeContext();
     }
 

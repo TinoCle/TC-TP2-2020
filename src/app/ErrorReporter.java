@@ -1,4 +1,7 @@
 package app;
+
+import java.util.LinkedList;
+
 public class ErrorReporter {
     
     public static final String ANSI_RED = "\u001B[31m";
@@ -76,6 +79,20 @@ public class ErrorReporter {
 
     public void missmatchingReturnType(int line){
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": missmatching type ‘return’ in function" + ANSI_RESET);
+    }
+
+    public void unusedVariables(LinkedList<ID> unused) {
+        for (ID id : unused) {
+            String error = ANSI_YELLOW + "WARNING\tThe ";
+            System.out.println();
+            if (id instanceof Variable) {
+                error += "variable ";
+            } else {
+                error += "function ";
+            }
+            error +=  id.getName() + " wasn't used." + ANSI_RESET;
+            System.out.println(error);
+        }
     }
 
 }

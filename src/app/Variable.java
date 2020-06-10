@@ -12,7 +12,13 @@ public class Variable extends ID {
 
     @Override
     public String toString() {
-        return getType() + " " + getName() + " = " + getValue();
+        String variable = getType() + " " + getName() + " = " + getValue();
+        if (isUsed()) {
+            variable += " (used)";
+        } else {
+            variable += " (unused)";
+        }
+        return variable;
     }
 
 }
