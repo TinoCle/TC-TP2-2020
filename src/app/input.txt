@@ -1,11 +1,11 @@
-int b;
+int a;
 {
-    int a;
-    a = 1;
+    a = 5 + 1;
     int b = a;
-    int b;
-    int c;
-    a = c;
-    a = 'c';
-    f = 2;
+    char c = 'f';
+    char d = c;
+    {
+        int c = 2;
+        double x = 2.1;
+    }
 }

@@ -230,5 +230,9 @@ public class Listener extends alBaseListener{
             return getParametersCount(ctx.parametros(), ++count);
         }
     }
+    
+    @Override public void exitProg(alParser.ProgContext ctx) {
+        symbolTable.printSymboltable();
+    }
 
 }

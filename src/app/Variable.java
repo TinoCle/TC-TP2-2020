@@ -12,7 +12,7 @@ public class Variable extends ID {
 
     @Override
     public String toString() {
-        return "\n=== Variable ===\nName:\t" + getName() + "\nType:\t" + getType() + "\nValue:\t" + getValue();
+        return getType() + " " + getName() + " = " + getValue();
     }
 
 }

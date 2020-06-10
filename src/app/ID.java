@@ -17,11 +17,6 @@ public abstract class ID {
         this.used = false;
     }
 
-    @Override
-    public String toString() {
-        return "\n=== ID ===\nName:\t" + name + "\nType:\t" + type + "\nValue:\t" + value;
-    }
-
     public String getType() {
         return this.type;
     }
