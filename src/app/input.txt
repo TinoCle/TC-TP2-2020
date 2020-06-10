@@ -1,11 +1,7 @@
-int a;
-{
-    a = 5 + 1;
-    int b = a;
-    char c = 'f';
-    char d = c;
-    {
-        int c = 2;
-        double x = 2.1;
-    }
+int suma (int suma, int y);
+
+int suma(int x, int y){
+    suma(1,2);
 }
+
+int x = suma (1, 2);

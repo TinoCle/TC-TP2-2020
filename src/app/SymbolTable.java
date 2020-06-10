@@ -55,6 +55,16 @@ public class SymbolTable {
         return null;
     }
 
+    public void setUsed(String name){
+        for (HashMap<String, ID> entry : this.symbolTable) {
+            for (String key : entry.keySet()) {
+                if (key.equals(name)){
+                    
+                }
+            }
+        }
+    }
+
     public Function getFunctionPrototype(Function function){
         ID idFound = this.symbolTable.getFirst().get(function.getName());
         if (idFound instanceof Function){

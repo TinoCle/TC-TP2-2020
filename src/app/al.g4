@@ -44,6 +44,7 @@ OR 		: '||' 	   ;
 DIFF 	: '!='     ;
 NOT 	: '!'	   ;
 
+RETURN : 'return' ;
 ID		: (LETRA | '_') (LETRA | DIGITO |'_')*;
 NUMERO	: DIGITO+;
 FLOTANTE: NUMERO'.'NUMERO ;
@@ -74,6 +75,7 @@ instruccion : declaracion PYC
 			| condicional
 			| iteracion
 			| bloque
+			| retornar PYC
             ;
 
 // int sum (int ,int);
@@ -82,6 +84,8 @@ instruccion : declaracion PYC
 declaracion_funcion : tipodato ID PA param_declaracion? PC
 					;
   
+retornar : RETURN factor;
+
 param_declaracion : tipodato (ID | )
 		   		  | tipodato (ID | ) COMA param_declaracion
 		   		  ;

@@ -17,6 +17,7 @@ public class Listener extends alBaseListener{
         dataTypes.put(alLexer.FLOTANTE, "double");
         dataTypes.put(alLexer.LITERAL, "char");
         dataTypes.put(alLexer.ID, "id");
+        dataTypes.put(alLexer.PC, "function");
     }
 
     @Override public void enterBloque(alParser.BloqueContext ctx) {
@@ -104,12 +105,23 @@ public class Listener extends alBaseListener{
             } else {
                 error.unexistentVariable(line, ctx.getStop().getText());
             }
-        } else if (!dataTypes.get(type).equals(leftID.getType())) { // trying to set some value and missmatching its type
+        }
+        else if (dataTypes.get(type).equals("function")){
+            String functionName = functionName(ctx);
+            if (!leftID.getType().equals(this.symbolTable.findVariable(functionName).getType())){
+                error.variableType(line);
+            }
+        }
+        else if (!dataTypes.get(type).equals(leftID.getType())) { // trying to set some value and missmatching its type
             error.variableType(line);
         } else { //set value
             leftID.setValue(ctx.getStop().getText());
             symbolTable.updateId(leftID);
         }
+    }
+
+    private String functionName(AsignacionContext ctx){
+        return ctx.asign().operacion().opal().disyuncion().conjuncion().igualdad().expresion().termino().factor().funcion().ID().getText();
     }
 
     @Override public void exitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx) {
@@ -134,6 +146,7 @@ public class Listener extends alBaseListener{
 
         if (ok){
             if (ctx.param_declaracion() != null) {
+                this.symbolTable.addContext();
                 params = getParamsDeclaration(ctx.param_declaracion(), params);
                 for (ID id : params) {
                     if (!id.getName().equals(""))
@@ -141,11 +154,11 @@ public class Listener extends alBaseListener{
                             error.existentVariable(ctx.getStart().getLine(), id.getName());
                     symbolTable.insertID(id);
                 }
+                this.symbolTable.removeContext();
             }
             function.setParams(params);
             symbolTable.insertID(function);
         }
-        
     }
 
     private ArrayList<ID> getParamsDeclaration(Param_declaracionContext ctx, ArrayList<ID> param){
@@ -179,6 +192,7 @@ public class Listener extends alBaseListener{
         function.setName(name);
         if (ctx.param_definicion() != null)
             params = getParamsDefinition(ctx.param_definicion(), params);
+     
         function.setParams(params);
         if (this.symbolTable.getContext() == 1){
             Function prototype = this.symbolTable.getFunctionPrototype(function);
@@ -209,7 +223,12 @@ public class Listener extends alBaseListener{
 
     @Override public void exitFuncion(alParser.FuncionContext ctx) {
         String functionName = ctx.ID().getText();
-        int paramCount = getParametersCount(ctx.parametros(), 0);
+        int paramCount;
+        if (ctx.parametros() != null){
+            paramCount = getParametersCount(ctx.parametros(), 0);
+        } else {
+            paramCount = 0;
+        }
         ID function = this.symbolTable.findVariable(functionName);
         if (function == null){
             error.implicitDeclaration(ctx.getStart().getLine(), functionName);
@@ -221,6 +240,7 @@ public class Listener extends alBaseListener{
         } else if (paramCount > ((Function) function).getParams().size()){
             error.tooManyArguments(ctx.getStart().getLine(), functionName);
         }
+        function.setUsed(true);
     }
 
     private int getParametersCount(ParametrosContext ctx, int count){

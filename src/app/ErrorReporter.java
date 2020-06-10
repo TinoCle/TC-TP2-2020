@@ -46,7 +46,7 @@ public class ErrorReporter {
     }
 
     public void variableType(int line) {
-        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Variable type missmatching." + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": Variable type missmatching." + ANSI_RESET);
     }
 
     public void usingUninitializedVariable(int line, String name) {
