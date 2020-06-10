@@ -109,7 +109,7 @@ public class Listener extends alBaseListener{
         } else if (!dataTypes.get(type).equals(leftID.getType())) { // trying to set some value and missmatching its type
             error.variableType(line);
         } else { //set value
-            leftID.setValue(Integer.parseInt(ctx.getStop().getText()));
+            leftID.setValue(ctx.getStop().getText());
             symbolTable.updateId(leftID);
         }
     }
@@ -196,14 +196,14 @@ public class Listener extends alBaseListener{
             ID id = new Variable();
             id.setName(ctx.ID().getText());
             id.setType(ctx.tipodato().getText());
-            id.setValue(1);
+            id.setValue("1");
             param.add(id);
             return getParamsDefinition(ctx.param_definicion(), param);
         } else{
             ID id = new Variable();
             id.setName(ctx.ID().getText());
             id.setType(ctx.tipodato().getText());
-            id.setValue(1);
+            id.setValue("1");
             param.add(id);
             return param;
         }
