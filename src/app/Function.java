@@ -24,7 +24,7 @@ public class Function extends ID{
                 function += ", ";
             }
             function += id.getType();
-            function += " value: " + id.getValue();
+            function += " = " + id.getValue();
             if (!id.getName().isEmpty()) {
                 function += " " + id.getName();
             }
