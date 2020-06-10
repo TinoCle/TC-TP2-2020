@@ -49,6 +49,10 @@ public class ErrorReporter {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": Variable type missmatching." + ANSI_RESET);
     }
 
+    public void missingAssignment(int line){
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Expected declaration or statement at end of input" + ANSI_RESET);
+    }
+
     public void usingUninitializedVariable(int line, String name) {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": The variable '" + name + "' is being used uninitialized." + ANSI_RESET);
     }
