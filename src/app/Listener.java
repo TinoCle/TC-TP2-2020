@@ -137,7 +137,7 @@ public class Listener extends alBaseListener{
             error.existentFunction(ctx.getStart().getLine(), function.getName());
             ok = false;
         } else if (this.symbolTable.getContext() != 1){ //if not global context
-            error.functionNotDeclaredGlobalContext(ctx.getStart().getLine());
+            error.functionNotDeclaredInGlobalContext(ctx.getStart().getLine());
             ok = false;
         } else if (this.symbolTable.checkVariableDeclared(function)){
             error.existentVariable(ctx.getStart().getLine(), function.getName());
@@ -250,7 +250,7 @@ public class Listener extends alBaseListener{
             return getParametersCount(ctx.parametros(), ++count);
         }
     }
-    
+
     @Override public void exitProg(alParser.ProgContext ctx) {
         symbolTable.printSymboltable();
     }

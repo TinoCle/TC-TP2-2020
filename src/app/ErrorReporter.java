@@ -53,8 +53,8 @@ public class ErrorReporter {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": The variable '" + name + "' is being used uninitialized." + ANSI_RESET);
     }
 
-    public void functionNotDeclaredGlobalContext(int line){
-        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": Function Not Declared in Glogal Context" + ANSI_RESET);
+    public void functionNotDeclaredInGlobalContext(int line){
+        System.out.println(ANSI_RED + "ERROR\tLine " + line+ ": The function prototype must be in the glogal context" + ANSI_RESET);
     }
 
 }
