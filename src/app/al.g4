@@ -84,7 +84,7 @@ instruccion : declaracion PYC
 declaracion_funcion : tipodato ID PA param_declaracion? PC
 					;
 
-retornar : RETURN (factor | );
+retornar : RETURN (operacion | );
 
 param_declaracion : tipodato (ID | )
 		   		  | tipodato (ID | ) COMA param_declaracion

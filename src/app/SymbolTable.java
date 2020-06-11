@@ -21,6 +21,7 @@ public class SymbolTable {
     }
 
     public void removeContext() {
+        //this.printSymboltable2();
         symbolTable.removeLast();
     }
 
@@ -43,6 +44,13 @@ public class SymbolTable {
                 System.out.println("    " + id.toString());
             }
             System.out.println("}");
+        }
+    }
+
+    public void printSymboltable2() {
+        System.out.println("Contexto:"+ this.getContext());
+        for (String key : this.symbolTable.getLast().keySet()) {
+            System.out.println(key);
         }
     }
 

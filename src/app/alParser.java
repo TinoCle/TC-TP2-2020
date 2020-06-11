@@ -584,8 +584,8 @@ public class alParser extends Parser {
 
 	public static class RetornarContext extends ParserRuleContext {
 		public TerminalNode RETURN() { return getToken(alParser.RETURN, 0); }
-		public FactorContext factor() {
-			return getRuleContext(FactorContext.class,0);
+		public OperacionContext operacion() {
+			return getRuleContext(OperacionContext.class,0);
 		}
 		public RetornarContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -629,7 +629,7 @@ public class alParser extends Parser {
 			case LITERAL:
 				{
 				setState(121);
-				factor();
+				operacion();
 				}
 				break;
 			case PYC:
@@ -2490,12 +2490,12 @@ public class alParser extends Parser {
 		"\5\16\b\2no\7\20\2\2oq\3\2\2\2p]\3\2\2\2p`\3\2\2\2pc\3\2\2\2pf\3\2\2\2"+
 		"pg\3\2\2\2pj\3\2\2\2pk\3\2\2\2pl\3\2\2\2pm\3\2\2\2q\13\3\2\2\2rs\5\32"+
 		"\16\2st\7\'\2\2tv\7\n\2\2uw\5\20\t\2vu\3\2\2\2vw\3\2\2\2wx\3\2\2\2xy\7"+
-		"\13\2\2y\r\3\2\2\2z}\7&\2\2{~\5\60\31\2|~\3\2\2\2}{\3\2\2\2}|\3\2\2\2"+
-		"~\17\3\2\2\2\177\u0082\5\32\16\2\u0080\u0083\7\'\2\2\u0081\u0083\3\2\2"+
-		"\2\u0082\u0080\3\2\2\2\u0082\u0081\3\2\2\2\u0083\u008d\3\2\2\2\u0084\u0087"+
-		"\5\32\16\2\u0085\u0088\7\'\2\2\u0086\u0088\3\2\2\2\u0087\u0085\3\2\2\2"+
-		"\u0087\u0086\3\2\2\2\u0088\u0089\3\2\2\2\u0089\u008a\7\21\2\2\u008a\u008b"+
-		"\5\20\t\2\u008b\u008d\3\2\2\2\u008c\177\3\2\2\2\u008c\u0084\3\2\2\2\u008d"+
+		"\13\2\2y\r\3\2\2\2z}\7&\2\2{~\5&\24\2|~\3\2\2\2}{\3\2\2\2}|\3\2\2\2~\17"+
+		"\3\2\2\2\177\u0082\5\32\16\2\u0080\u0083\7\'\2\2\u0081\u0083\3\2\2\2\u0082"+
+		"\u0080\3\2\2\2\u0082\u0081\3\2\2\2\u0083\u008d\3\2\2\2\u0084\u0087\5\32"+
+		"\16\2\u0085\u0088\7\'\2\2\u0086\u0088\3\2\2\2\u0087\u0085\3\2\2\2\u0087"+
+		"\u0086\3\2\2\2\u0088\u0089\3\2\2\2\u0089\u008a\7\21\2\2\u008a\u008b\5"+
+		"\20\t\2\u008b\u008d\3\2\2\2\u008c\177\3\2\2\2\u008c\u0084\3\2\2\2\u008d"+
 		"\21\3\2\2\2\u008e\u008f\5\32\16\2\u008f\u0090\7\'\2\2\u0090\u0092\7\n"+
 		"\2\2\u0091\u0093\5\24\13\2\u0092\u0091\3\2\2\2\u0092\u0093\3\2\2\2\u0093"+
 		"\u0094\3\2\2\2\u0094\u0095\7\13\2\2\u0095\u0096\5\6\4\2\u0096\23\3\2\2"+

@@ -144,7 +144,11 @@ public class Listener extends alBaseListener {
         for (ParseTree ctx : XPath.findAll(parseTree, "//factor", parser)) {
             factores.add((FactorContext) ctx);
         }
-        return factores;
+        if (factores.size() > 0){
+            return factores;
+        } else{
+            return null;
+        }
     }
 
 
@@ -253,12 +257,16 @@ public class Listener extends alBaseListener {
         } else {
             paramCount = 0;
         }
+        //System.out.println(ctx.parent.getClass());
         ID function = this.symbolTable.findVariable(functionName);
         if (function == null){
-            error.implicitDeclaration(ctx.getStart().getLine(), functionName);
-            return;
+            function = buildFunction(findFunctionCtx(ctx));
+            if (function == null){
+                error.implicitDeclaration(ctx.getStart().getLine(), functionName);
+                return;
+            }
         }
-        else if (!(function instanceof Function)){
+        if (!(function instanceof Function)){
             error.callingNotFunction(ctx.getStart().getLine(), functionName);
         } else if (paramCount < ((Function) function).getParams().size()){
             error.tooFewArguments(ctx.getStart().getLine(), functionName);
@@ -266,6 +274,20 @@ public class Listener extends alBaseListener {
             error.tooManyArguments(ctx.getStart().getLine(), functionName);
         }
         function.setUsed(true);
+        
+    }
+
+    private Function buildFunction (Definicion_funcionContext ctx){
+        Function function = new Function();
+        ArrayList<ID> params = new ArrayList<>();
+        String type = ctx.tipodato().getText();
+        String name = ctx.ID().getText();
+        function.setType(type);
+        function.setName(name);
+        if (ctx.param_definicion() != null)
+            params = getParamsDefinition(ctx.param_definicion(), params);
+        function.setParams(params);
+        return function;
     }
 
     private int getParametersCount(ParametrosContext ctx, int count){
@@ -277,37 +299,47 @@ public class Listener extends alBaseListener {
     }
 
     @Override public void exitRetornar(alParser.RetornarContext ctx) {        
-        Definicion_funcionContext fnCtx = findFunction(ctx);
+        Definicion_funcionContext fnCtx = findFunctionCtx(ctx);
+        ArrayList<FactorContext> factores = getFactors(ctx);
         if (fnCtx != null){
-            if (fnCtx.tipodato().getText().equals("void") && ctx.factor() != null){
+            if (fnCtx.tipodato().getText().equals("void") && factores != null){
                 error.returnValueVoid(ctx.getStart().getLine());
                 return;
-            } else if (!fnCtx.tipodato().getText().equals("void") && ctx.factor() == null){
+            } else if (!fnCtx.tipodato().getText().equals("void") && factores == null){
                 error.returnNoValueNonVoid(ctx.getStart().getLine());
                 return;
-            } else if (!compareTypes(ctx, ctx.factor())){
-                error.missmatchingReturnType(ctx.getStart().getLine());
+            } else {
+                boolean ok = true;
+                for (FactorContext factor : factores) {
+                    if (!compareTypes(factor, fnCtx))
+                        ok = false;
+                }
+                if (!ok){ //to print only 1 warning
+                    error.missmatchingReturnType(ctx.getStart().getLine());
+                }
             }
         } else{
             error.returnOutsideFunction(ctx.getStart().getLine());
         }
     }
 
-    private boolean compareTypes (RetornarContext ctx, FactorContext factor){
-        if (factor.NUMERO() != null && ctx.factor().equals(factor)){
+    private boolean compareTypes (FactorContext factor, Definicion_funcionContext function){
+        String functionType = function.tipodato().getText();
+        if (factor.NUMERO() != null && functionType.equals("int")){
             return true;
         }
-        if (factor.FLOTANTE() != null && ctx.factor().equals(factor)){
+        if (factor.FLOTANTE() != null && functionType.equals("double")){
             return true;
         }
-        if (factor.LITERAL() != null && ctx.factor().equals(factor)){
+        if (factor.LITERAL() != null && functionType.equals("char")){
             return true;
         }
-        return false;
-        /* if (factor.funcion() != null){
-            String functionName = factor.funcion().getText();
-            Function function = (Function) symbolTable.findVariable(functionName);
-            if (ctx.factor().equals(function.getctx.factor()())) {
+        if (factor.funcion() != null){
+            String functionName = factor.funcion().ID().getText();
+            if (functionName.equals(function.ID().getText()))
+                return true;
+            Function fnCalled = (Function) symbolTable.findVariable(functionName);
+            if (fnCalled.getType().equals(functionType) && fnCalled != null) {
                 return true;
             } else{
                 return false;
@@ -316,20 +348,21 @@ public class Listener extends alBaseListener {
         if (factor.ID() != null){
             ID id = this.symbolTable.findVariable(factor.ID().getText());
             if (id != null) { // right ID exists
-                if (type.equals(id.getType())) { // variables with same type
+                if (functionType.equals(id.getType())) {
                     return true;
                 } else {
                     return false;
                 }
             } else {
-                error.unexistentVariable(line, ctx.getStop().getText());
+                error.unexistentVariable(factor.getStart().getLine(), factor.getStop().getText());
             }
-        } */
+        }
+        return false;
     }
 
-    private Definicion_funcionContext findFunction(ParseTree parseTree){
+    private Definicion_funcionContext findFunctionCtx(ParseTree parseTree){
         if (!(parseTree instanceof Definicion_funcionContext) && parseTree.getParent() != null) {
-            return findFunction (parseTree.getParent());
+            return findFunctionCtx (parseTree.getParent());
         } else if (parseTree.getParent() == null){
             return null;
         }
