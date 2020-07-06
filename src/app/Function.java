@@ -11,6 +11,8 @@ public class Function extends ID{
 
     public Function(String type, String name) {
         super();
+        this.setType(type);
+        this.setName(name);
         this.params = new ArrayList<ID>();
     }
 

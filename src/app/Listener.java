@@ -3,39 +3,26 @@ package app;
 import app.alParser.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.xpath.XPath;
 
 public class Listener extends alBaseListener {
-
-    SymbolTable symbolTable = new SymbolTable();
+    SymbolTable symbolTable = SymbolTable.getInstance();
     ErrorReporter error = ErrorReporter.getInstance();
-    HashMap<Integer, String> dataTypes = new HashMap<>();
     alParser parser;
 
     public Listener(alParser parser) {
         System.out.println("\n");
-        dataTypes.put(alLexer.NUMERO, "int");
-        dataTypes.put(alLexer.FLOTANTE, "double");
-        dataTypes.put(alLexer.LITERAL, "char");
-        dataTypes.put(alLexer.ID, "id");
-        dataTypes.put(alLexer.PC, "function");
         this.parser = parser;
     }
 
     @Override
     public void enterBloque(alParser.BloqueContext ctx) {
-
         if (ctx.getParent() instanceof Definicion_funcionContext) {
             Definicion_funcionContext fnCtx = (Definicion_funcionContext) ctx.getParent();
+            Function function = AuxFunctions.processFunction(fnCtx);
+            this.symbolTable.insertID(function);
+            this.symbolTable.addContext();
             if (fnCtx.param_definicion() != null) {
-                ArrayList<ID> params = new ArrayList<>();
-                params = getParamsDefinition(fnCtx.param_definicion(), params);
-                for (ID id : params) {
-                    if (this.symbolTable.checkVariableDeclared(id))
-                        error.existentVariable(ctx.getStart().getLine(), id.getName());
+                for (ID id : function.getParams()) {
                     symbolTable.insertID(id);
                 }
             }
@@ -52,9 +39,8 @@ public class Listener extends alBaseListener {
 
     @Override
     public void exitDeclaracion(alParser.DeclaracionContext ctx) {
-        ID id;
         if (ctx.asignacion() == null) { // just declaration, asignation also inserts the ID into symbolTable
-            id = new Variable(ctx.tipodato().getText(), ctx.ID().getText());
+            ID id = new Variable(ctx.tipodato().getText(), ctx.ID().getText());
             if (!this.symbolTable.checkVariableDeclared(id)) { // new variable
                 symbolTable.insertID(id);
             } else {
@@ -65,13 +51,9 @@ public class Listener extends alBaseListener {
 
     @Override
     public void exitAsignacion(AsignacionContext ctx) {
-        this.checkAsignacion(ctx);
-    }
-
-    private void checkAsignacion(AsignacionContext ctx) {
         ID leftID = symbolTable.findVariable(ctx.ID().getText());
         int line = ctx.getStart().getLine();
-        if (ctx.getParent() instanceof DeclaracionContext){ // comming from 'declaracion', build leftID
+        if (ctx.getParent() instanceof DeclaracionContext){ // comming from 'declaracion', have to declare a new variable "leftID"
             String leftIdName = ctx.ID().getText();
             String leftIdType = ((DeclaracionContext) ctx.getParent()).tipodato().getText();
             leftID = new Variable(leftIdType, leftIdName);
@@ -81,7 +63,7 @@ public class Listener extends alBaseListener {
                 error.existentVariable(ctx.getStop().getLine(), leftID.getName());
             }
         }
-        ArrayList<FactorContext> factores = getFactors(ctx);
+        ArrayList<FactorContext> factores = AuxFunctions.getFactors(ctx, this.parser);
         if (leftID == null) { // left ID doesn't exists
             error.unexistentVariable(line, ctx.ID().getText());
             return;
@@ -91,96 +73,27 @@ public class Listener extends alBaseListener {
             return;
         }
         for (FactorContext factor : factores) {
-            if (factor.ID() != null && !factor.ID().getText().equals(leftID.getName())){
-                ID rightID = this.symbolTable.findVariable(factor.ID().getText());
-                if (rightID != null) { // right ID exists
-                    if (!rightID.isInitialized()) { // right ID is uninitialized
-                        error.usingUninitializedVariable(line, rightID.getName());
-                    }
-                    if (leftID.getType().equals(rightID.getType())) { // variables with same type
-                        leftID.setValue(rightID.getValue());
-                        this.symbolTable.updateId(leftID);
-                    } else {
-                        error.variableType(line);
-                    }
-                } else {
-                    error.unexistentVariable(line, ctx.getStop().getText());
-                }
-            } else if (factor.funcion() != null) {
-                String functionName = factor.funcion().getText();
-                Function function = (Function) symbolTable.findVariable(functionName);
-                if (function != null){
-                    leftID.setValue(functionName);
-                    if (!leftID.getType().equals(function.getType())) {
-                        error.variableType(line);
-                    }
-                }
-            } else if (factor.NUMERO() != null){
-                leftID.setValue(factor.NUMERO().getText());
-                if (!(leftID.getType().equals("int") || leftID.getType().equals("double"))){
-                    error.variableType(line);
-                }
-            } else if(factor.FLOTANTE() != null){
-                leftID.setValue(factor.FLOTANTE().getText());
-                if (!(leftID.getType().equals("int") || leftID.getType().equals("double"))){
-                    error.variableType(line);
-                }
-            } else if (factor.LITERAL() != null){
-                leftID.setValue(factor.LITERAL().getText());
-                if (!leftID.getType().equals("char")){
-                    error.variableType(line);
-                }
+            if (!AuxFunctions.compareTypes(leftID.getType(), factor)){
+                error.variableType(line);
             }
-            else { // set value
-                symbolTable.updateId(leftID);
-            }        
-        }
-        
-    }
-
-
-    private ArrayList<FactorContext> getFactors(ParseTree parseTree) {
-        ArrayList<FactorContext> factores = new ArrayList<FactorContext>();
-        for (ParseTree ctx : XPath.findAll(parseTree, "//factor", parser)) {
-            factores.add((FactorContext) ctx);
-        }
-        if (factores.size() > 0){
-            return factores;
-        } else{
-            return null;
         }
     }
 
-
+    //Function Prototype
     @Override public void exitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx) {
-        ArrayList<ID> params = new ArrayList<>();
-        boolean ok = true;
-        Function function = new Function();
         String type = ctx.tipodato().getText();
         String name = ctx.ID().getText();
-        function.setType(type);
-        function.setName(name);
-
-        if (this.symbolTable.getFunctionPrototype(function) != null){
-            error.existentFunction(ctx.getStart().getLine(), function.getName());
-            ok = false;
-        } else if (this.symbolTable.getContext() != 1){ //if not global context
-            error.functionNotDeclaredInGlobalContext(ctx.getStart().getLine());
-            ok = false;
-        } else if (this.symbolTable.checkVariableDeclared(function)){
-            error.existentVariable(ctx.getStart().getLine(), function.getName());
-            ok = false;
-        }
-
-        if (ok){
+        Function function = new Function(type, name);
+        ArrayList<ID> params = new ArrayList<>();
+        if (AuxFunctions.checkFunction(function, ctx)){
             if (ctx.param_declaracion() != null) {
-                this.symbolTable.addContext();
-                params = getParamsDeclaration(ctx.param_declaracion(), params);
+                this.symbolTable.addParamContext();
+                params = AuxFunctions.getParams(ctx.param_declaracion(), params);
                 for (ID id : params) {
                     if (!id.getName().equals(""))
                         if (this.symbolTable.checkVariableDeclared(id))
                             error.existentVariable(ctx.getStart().getLine(), id.getName());
-                    symbolTable.insertID(id);
+                    symbolTable.insertParam(id);
                 }
                 this.symbolTable.removeContext();
             }
@@ -188,83 +101,26 @@ public class Listener extends alBaseListener {
             symbolTable.insertID(function);
         }
     }
-
-    private ArrayList<ID> getParamsDeclaration(Param_declaracionContext ctx, ArrayList<ID> param){
-        if (ctx.param_declaracion() != null) {
-            ID id = new Variable();
-            id.setName(ctx.ID() != null ? ctx.ID().getText() : "");
-            id.setType(ctx.tipodato().getText());
-            param.add(id);
-            return getParamsDeclaration(ctx.param_declaracion(), param);
-        } else{
-            ID id = new Variable();
-            id.setName(ctx.ID() != null ? ctx.ID().getText() : "");
-            id.setType(ctx.tipodato().getText());
-            param.add(id);
-            return param;
-        }
-    }
-
-    //First I create a function context, so i can set variables in the same place
-    @Override public void enterDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
-        symbolTable.addContext();
-    }
     
-    //And then I create the Function setting its type, parameters and name
-    @Override public void exitDefinicion_funcion(alParser.Definicion_funcionContext ctx) {
-        Function function = new Function();
-        ArrayList<ID> params = new ArrayList<>();
-        String type = ctx.tipodato().getText();
-        String name = ctx.ID().getText();
-        function.setType(type);
-        function.setName(name);
-        if (ctx.param_definicion() != null)
-            params = getParamsDefinition(ctx.param_definicion(), params);
-     
-        function.setParams(params);
-        if (this.symbolTable.getContext() == 1){
-            Function prototype = this.symbolTable.getFunctionPrototype(function);
-            if (prototype != null && !function.equals(prototype)){
-                error.conflictingTypes(ctx.getStart().getLine(), function.getName());
+    //Checking if function has return
+    @Override
+    public void exitDefinicion_funcion(Definicion_funcionContext ctx) {
+        if (!ctx.ID().getText().equals("main")){
+            boolean hasReturn = AuxFunctions.hasExit(ctx, parser);
+            if (!ctx.tipodato().getText().equals("void") && !hasReturn){
+                error.missingReturn(ctx.getStart().getLine());
             }
         }
-        symbolTable.insertID(function);
     }
 
-    private ArrayList<ID> getParamsDefinition(Param_definicionContext ctx, ArrayList<ID> param){
-        if (ctx.param_definicion() != null) {
-            ID id = new Variable();
-            id.setName(ctx.ID().getText());
-            id.setType(ctx.tipodato().getText());
-            id.setValue("1");
-            param.add(id);
-            return getParamsDefinition(ctx.param_definicion(), param);
-        } else{
-            ID id = new Variable();
-            id.setName(ctx.ID().getText());
-            id.setType(ctx.tipodato().getText());
-            id.setValue("1");
-            param.add(id);
-            return param;
-        }
-    }
-
+    //Function Call
     @Override public void exitFuncion(alParser.FuncionContext ctx) {
         String functionName = ctx.ID().getText();
-        int paramCount;
-        if (ctx.parametros() != null){
-            paramCount = getParametersCount(ctx.parametros(), 0);
-        } else {
-            paramCount = 0;
-        }
-        //System.out.println(ctx.parent.getClass());
+        int paramCount = AuxFunctions.getFactors(ctx.parametros(), this.parser).size();
         ID function = this.symbolTable.findVariable(functionName);
         if (function == null){
-            function = buildFunction(findFunctionCtx(ctx));
-            if (function == null){
-                error.implicitDeclaration(ctx.getStart().getLine(), functionName);
-                return;
-            }
+            error.implicitDeclaration(ctx.getStart().getLine(), functionName);
+            return;
         }
         if (!(function instanceof Function)){
             error.callingNotFunction(ctx.getStart().getLine(), functionName);
@@ -274,100 +130,31 @@ public class Listener extends alBaseListener {
             error.tooManyArguments(ctx.getStart().getLine(), functionName);
         }
         function.setUsed(true);
-        
     }
 
-    private Function buildFunction (Definicion_funcionContext ctx){
-        Function function = new Function();
-        ArrayList<ID> params = new ArrayList<>();
-        String type = ctx.tipodato().getText();
-        String name = ctx.ID().getText();
-        function.setType(type);
-        function.setName(name);
-        if (ctx.param_definicion() != null)
-            params = getParamsDefinition(ctx.param_definicion(), params);
-        function.setParams(params);
-        return function;
-    }
-
-    private int getParametersCount(ParametrosContext ctx, int count){
-        if (ctx.parametros() == null){
-            return ++count;
-        }else{
-            return getParametersCount(ctx.parametros(), ++count);
-        }
-    }
-
+    //Return Statement
     @Override public void exitRetornar(alParser.RetornarContext ctx) {        
-        Definicion_funcionContext fnCtx = findFunctionCtx(ctx);
-        ArrayList<FactorContext> factores = getFactors(ctx);
-        if (fnCtx != null){
-            if (fnCtx.tipodato().getText().equals("void") && factores != null){
+        Definicion_funcionContext fnCtx = AuxFunctions.findFunctionCtx(ctx);
+        if (fnCtx == null){
+            error.returnOutsideFunction(ctx.getStart().getLine());
+        }
+        else{ //it's in a function context
+            String functionType = fnCtx.tipodato().getText();
+            ArrayList<FactorContext> returnFactors = AuxFunctions.getFactors(ctx, this.parser);
+            if (functionType.equals("void") && returnFactors != null){ //returning values inside void function
                 error.returnValueVoid(ctx.getStart().getLine());
                 return;
-            } else if (!fnCtx.tipodato().getText().equals("void") && factores == null){
+            } else if (!functionType.equals("void") && returnFactors == null){ //not returning values in non void function
                 error.returnNoValueNonVoid(ctx.getStart().getLine());
                 return;
             } else {
-                boolean ok = true;
-                for (FactorContext factor : factores) {
-                    if (!compareTypes(factor, fnCtx))
-                        ok = false;
-                }
-                if (!ok){ //to print only 1 warning
-                    error.missmatchingReturnType(ctx.getStart().getLine());
+                for (FactorContext factor : returnFactors) {
+                    if (!AuxFunctions.compareTypes(functionType, factor)){
+                        error.missmatchingReturnType(ctx.getStart().getLine());
+                        return;
+                    }
                 }
             }
-        } else{
-            error.returnOutsideFunction(ctx.getStart().getLine());
-        }
-    }
-
-    private boolean compareTypes (FactorContext factor, Definicion_funcionContext function){
-        String functionType = function.tipodato().getText();
-        if (factor.NUMERO() != null && functionType.equals("int")){
-            return true;
-        }
-        if (factor.FLOTANTE() != null && functionType.equals("double")){
-            return true;
-        }
-        if (factor.LITERAL() != null && functionType.equals("char")){
-            return true;
-        }
-        if (factor.funcion() != null){
-            String functionName = factor.funcion().ID().getText();
-            if (functionName.equals(function.ID().getText()))
-                return true;
-            Function fnCalled = (Function) symbolTable.findVariable(functionName);
-            if (fnCalled.getType().equals(functionType) && fnCalled != null) {
-                return true;
-            } else{
-                return false;
-            }
-        }
-        if (factor.ID() != null){
-            ID id = this.symbolTable.findVariable(factor.ID().getText());
-            if (id != null) { // right ID exists
-                if (functionType.equals(id.getType())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                error.unexistentVariable(factor.getStart().getLine(), factor.getStop().getText());
-            }
-        }
-        return false;
-    }
-
-    private Definicion_funcionContext findFunctionCtx(ParseTree parseTree){
-        if (!(parseTree instanceof Definicion_funcionContext) && parseTree.getParent() != null) {
-            return findFunctionCtx (parseTree.getParent());
-        } else if (parseTree.getParent() == null){
-            return null;
-        }
-        else{
-            return (Definicion_funcionContext) parseTree;
         }
     }
  
@@ -378,5 +165,4 @@ public class Listener extends alBaseListener {
         }
         this.symbolTable.removeContext();
     }
-
 }

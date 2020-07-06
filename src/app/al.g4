@@ -80,7 +80,6 @@ instruccion : declaracion PYC
 
 // int sum (int ,int);
 // int sum (int x, int y);
-// int sum (int x, int y){}
 declaracion_funcion : tipodato ID PA param_declaracion? PC
 					;
 

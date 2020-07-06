@@ -7,6 +7,14 @@ public class SymbolTable {
 
     private LinkedList<HashMap<String, ID>> symbolTable;
     private LinkedList<HashMap<String, ID>> historicSymbolTable; // this is used at the end of the program to print all the symbols and contexts
+    private static SymbolTable instance;
+
+    public static SymbolTable getInstance() {
+        if (instance == null) {
+            instance = new SymbolTable();
+        }
+        return instance;
+    }
 
     public SymbolTable() {
         symbolTable = new LinkedList<HashMap<String, ID>>();
@@ -19,6 +27,12 @@ public class SymbolTable {
         symbolTable.add(context);
         historicSymbolTable.add(context);
     }
+    
+    //Temporal context used to store function paramaters
+    public void addParamContext(){
+        HashMap<String, ID> context = new HashMap<String, ID>();
+        symbolTable.add(context);
+    }
 
     public void removeContext() {
         //this.printSymboltable2();
@@ -26,9 +40,14 @@ public class SymbolTable {
     }
 
     public void insertID(ID id) {
-        // System.out.println("Insertando " + id.getName() + " en el contexto " + symbolTable.size());
         symbolTable.getLast().put(id.getName(), id);
-        historicSymbolTable.getLast().put(id.getName(), id);
+        int index = symbolTable.size()-1;
+        historicSymbolTable.get(index).put(id.getName(), id);
+        
+    }
+
+    public void insertParam(ID id){
+        symbolTable.getLast().put(id.getName(), id);
     }
 
     public boolean checkVariableDeclared(ID id){
@@ -56,10 +75,10 @@ public class SymbolTable {
 
     public ID findVariable(String name){
         for (HashMap<String, ID> entry : this.symbolTable) {
-            for (String key : entry.keySet()) {
-                if (key.equals(name)){
-                    setUsed(name);
-                    return entry.get(key);
+            for (ID id : entry.values()) {
+                if (id.getName().equals(name)) {
+                    id.setUsed(true);
+                    return id;
                 }
             }
         }

@@ -88,6 +88,10 @@ public class ErrorReporter {
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": ‘return’ with no value, in function returning non-void" + ANSI_RESET);
     }
 
+    public void missingReturn(int line){
+        System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": missing ‘return’ in function" + ANSI_RESET);
+    }
+
     public void missmatchingReturnType(int line){
         System.out.println(ANSI_YELLOW + "WARNING\tLine " + line+ ": missmatching type ‘return’ in function" + ANSI_RESET);
     }
@@ -97,11 +101,10 @@ public class ErrorReporter {
             String error = ANSI_YELLOW + "WARNING\tThe ";
             System.out.println();
             if (id instanceof Variable) {
-                error += "variable ";
+                error += "variable " + id.getName() + " wasn't used in context " + context + "." + ANSI_RESET;;
             } else {
-                error += "function ";
+                error += "function " + id.getName() + " wasn't used." + ANSI_RESET;;
             }
-            error +=  id.getName() + " wasn't used in context " + context + "." + ANSI_RESET;
             System.out.println(error);
         }
     }
