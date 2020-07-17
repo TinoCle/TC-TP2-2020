@@ -1,7 +1,8 @@
 package app;
 
 import app.alParser.*;
-
+import app.SymbolsTable.*;
+import app.Auxiliars.*;
 import java.util.ArrayList;
 
 public class Listener extends alBaseListener {

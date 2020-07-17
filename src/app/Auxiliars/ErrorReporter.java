@@ -1,6 +1,8 @@
-package app;
+package app.Auxiliars;
 
 import java.util.LinkedList;
+import app.SymbolsTable.ID;
+import app.SymbolsTable.Variable;
 
 public class ErrorReporter {
     

@@ -1,4 +1,4 @@
-package app;
+package app.SymbolsTable;
 
 public class Variable extends ID {
     

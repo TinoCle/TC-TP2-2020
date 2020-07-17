@@ -1,4 +1,4 @@
-package app;
+package app.SymbolsTable;
 
 import java.util.ArrayList;
 

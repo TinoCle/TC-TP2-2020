@@ -1,4 +1,4 @@
-package app;
+package app.SymbolsTable;
 
 public abstract class ID {
     private String type;

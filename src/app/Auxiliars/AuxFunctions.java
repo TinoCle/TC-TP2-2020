@@ -1,12 +1,11 @@
-package app;
+package app.Auxiliars;
 
 import java.util.ArrayList;
-
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.xpath.XPath;
-
+import app.SymbolsTable.*;
 import app.alParser.*;
 
 public class AuxFunctions {
