@@ -88,6 +88,17 @@ public class AuxFunctions {
         }
     }
 
+    public static ID setValue(ID leftID, FactorContext factor) {
+        SymbolTable symbolTable = SymbolTable.getInstance();
+        if (factor.NUMERO() != null || factor.FLOTANTE() != null || factor.LITERAL() != null){
+            leftID.setValue(factor.getText());
+        }
+        if (factor.ID() != null) {
+            leftID.setValue(symbolTable.findVariable(factor.ID().getText()).getValue());
+        }
+        return leftID;
+    }
+
     public static boolean compareTypes (String idType, FactorContext factor){
         SymbolTable symbolTable = SymbolTable.getInstance();
         ErrorReporter error = ErrorReporter.getInstance();

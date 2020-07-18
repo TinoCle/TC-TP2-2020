@@ -5,13 +5,12 @@ import app.SymbolsTable.*;
 import app.Auxiliars.*;
 import java.util.ArrayList;
 
-public class Listener extends alBaseListener {
+public class CustomListener extends alBaseListener {
     SymbolTable symbolTable = SymbolTable.getInstance();
     ErrorReporter error = ErrorReporter.getInstance();
     alParser parser;
 
-    public Listener(alParser parser) {
-        System.out.println("\n");
+    public CustomListener(alParser parser) {
         this.parser = parser;
     }
 
@@ -76,6 +75,8 @@ public class Listener extends alBaseListener {
         for (FactorContext factor : factores) {
             if (!AuxFunctions.compareTypes(leftID.getType(), factor)){
                 error.variableType(line);
+            } else {
+                symbolTable.updateId(AuxFunctions.setValue(leftID, factor));
             }
         }
     }
