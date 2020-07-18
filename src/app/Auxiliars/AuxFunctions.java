@@ -9,14 +9,14 @@ import app.SymbolsTable.*;
 import app.alParser.*;
 
 public class AuxFunctions {
-    public static Function processFunction (Definicion_funcionContext ctx){
+    public static Function processFunction (Definicion_funcionContext ctx) {
         SymbolTable symbolTable = SymbolTable.getInstance();
         ErrorReporter error = ErrorReporter.getInstance();
         String type = ctx.tipodato().getText();
         String name = ctx.ID().getText();
         Function function = new Function(type, name);
         ArrayList<ID> params = new ArrayList<>();
-        if (ctx.param_definicion() != null){
+        if (ctx.param_definicion() != null) {
             symbolTable.addParamContext();
             params = getParams(ctx.param_definicion(), params);
             for (ID id : params) {
@@ -27,33 +27,33 @@ public class AuxFunctions {
             symbolTable.removeContext();
         }
         function.setParams(params);
-        if (symbolTable.getContext() == 1){
+        if (symbolTable.getContext() == 1) {
             Function prototype = symbolTable.getFunctionPrototype(function);
-            if (prototype != null && !function.equals(prototype)){
+            if (prototype != null && !function.equals(prototype)) {
                 error.conflictingTypes(ctx.getStart().getLine(), function.getName());
             }
         }
         return function;
     }
 
-    public static boolean checkFunction(Function function, Declaracion_funcionContext ctx){
+    public static boolean checkFunction(Function function, Declaracion_funcionContext ctx) {
         SymbolTable symbolTable = SymbolTable.getInstance();
         ErrorReporter error = ErrorReporter.getInstance();
-        if (symbolTable.getFunctionPrototype(function) != null){
+        if (symbolTable.getFunctionPrototype(function) != null) {
             error.existentFunction(ctx.getStart().getLine(), function.getName());
             return false;
-        } else if (symbolTable.getContext() != 1){ //if not global context
+        } else if (symbolTable.getContext() != 1) { //if not global context
             error.functionNotDeclaredInGlobalContext(ctx.getStart().getLine());
             return false;
-        } else if (symbolTable.checkVariableDeclared(function)){
+        } else if (symbolTable.checkVariableDeclared(function)) {
             error.existentVariable(ctx.getStart().getLine(), function.getName());
             return false;
         }
         return true;
     }
     
-    public static ArrayList<ID> getParams(ParserRuleContext ctx, ArrayList<ID> param){
-        if(ctx instanceof Param_declaracionContext){
+    public static ArrayList<ID> getParams(ParserRuleContext ctx, ArrayList<ID> param) {
+        if(ctx instanceof Param_declaracionContext) {
             Param_declaracionContext ctx2 = (Param_declaracionContext) ctx;
             if (ctx2.param_declaracion() != null) {
                 ID id = new Variable();
@@ -90,7 +90,7 @@ public class AuxFunctions {
 
     public static ID setValue(ID leftID, FactorContext factor) {
         SymbolTable symbolTable = SymbolTable.getInstance();
-        if (factor.NUMERO() != null || factor.FLOTANTE() != null || factor.LITERAL() != null){
+        if (factor.NUMERO() != null || factor.FLOTANTE() != null || factor.LITERAL() != null) {
             leftID.setValue(factor.getText());
         }
         if (factor.ID() != null) {
@@ -99,19 +99,19 @@ public class AuxFunctions {
         return leftID;
     }
 
-    public static boolean compareTypes (String idType, FactorContext factor){
+    public static boolean compareTypes (String idType, FactorContext factor) {
         SymbolTable symbolTable = SymbolTable.getInstance();
         ErrorReporter error = ErrorReporter.getInstance();
-        if (factor.NUMERO() != null && idType.equals("int")){
+        if (factor.NUMERO() != null && idType.equals("int")) {
             return true;
         }
-        if (factor.FLOTANTE() != null && idType.equals("double")){
+        if (factor.FLOTANTE() != null && idType.equals("double")) {
             return true;
         }
-        if (factor.LITERAL() != null && idType.equals("char")){
+        if (factor.LITERAL() != null && idType.equals("char")) {
             return true;
         }
-        if (factor.funcion() != null){
+        if (factor.funcion() != null) {
             String functionName = factor.funcion().ID().getText();
             Function fnCalled = (Function) symbolTable.findVariable(functionName);
             if (fnCalled.getType().equals(idType) && fnCalled != null) {
@@ -120,7 +120,7 @@ public class AuxFunctions {
                 return false;
             }
         }
-        if (factor.ID() != null){
+        if (factor.ID() != null) {
             ID id2 = symbolTable.findVariable(factor.ID().getText());
             if (id2 != null) { // right ID exists
                 if (idType.equals(id2.getType())) {
@@ -140,17 +140,17 @@ public class AuxFunctions {
         for (ParseTree ctx : XPath.findAll(parseTree, "//factor", parser)) {
             factores.add((FactorContext) ctx);
         }
-        if (factores.size() > 0){
+        if (factores.size() > 0) {
             return factores;
         } else{
             return null;
         }
     }
 
-    public static Definicion_funcionContext findFunctionCtx(ParseTree parseTree){
+    public static Definicion_funcionContext findFunctionCtx(ParseTree parseTree) {
         if (!(parseTree instanceof Definicion_funcionContext) && parseTree.getParent() != null) {
             return findFunctionCtx (parseTree.getParent());
-        } else if (parseTree.getParent() == null){
+        } else if (parseTree.getParent() == null) {
             return null;
         }
         else{
@@ -161,7 +161,7 @@ public class AuxFunctions {
     public static boolean hasExit(ParseTree parseTree, Parser parser) {
         int returnCount = XPath.findAll(parseTree, "//retornar", parser).size();
         System.out.println("Returns:" + returnCount);
-        if (returnCount > 0){
+        if (returnCount > 0) {
             return true;
         }
         else{
