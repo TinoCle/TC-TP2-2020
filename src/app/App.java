@@ -1,5 +1,6 @@
 package app;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -24,6 +25,11 @@ public class App {
         parser.addParseListener(listener);
         // Solicito al parser que comience indicando una regla gramatical
         // En este caso la regla es el simbolo inicial
-        parser.prog();
+        ParseTree tree = parser.prog();
+
+        // Implementacion de Visitor
+        Visitor visitor = new Visitor();
+        visitor.visit(tree);
+        visitor.printCode();
     }
 }
