@@ -305,25 +305,26 @@ public class Visitor extends alBaseVisitor<String> {
             System.out.println("Operator:" + factores.get(i).getText());
         }
     }
-    /* @Override
-    public String visitCyclefor(CycleforContext ctx) {
-        countLbl++;
-
-        visitAssignment(ctx.assignment());
-
-        int aux = countLbl;
-        result += String.format("label L%s\n", countLbl);
-        countLbl++;
-        result += String.format("ifnot %s, jmp L%s\n", ctx.operation().getText(), countLbl);
-        visitBlock(ctx.instruction().block());
-
-        result += String.format("%s %s\n", ctx.ID().getText(), ctx.asign().getText());
-        result += String.format("jmp L%s\n", aux);
-        result += String.format("label L%s\n", countLbl);
-
-        return "";
-    } */
     
+    @Override
+    public String visitCondicional(CondicionalContext ctx) {
+        String operation = ctx.operacion().get(0).getText();
+        this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
+        visitChildren(ctx.instruccion().get(0).bloque());
+        this.code += String.format("\nL%s", LblCount);
+        if (ctx.ELIF() != null){ // If there's at least 1 else if block we iterate over all possible else if blocks
+            for (int i = 0; i < ctx.ELIF().size(); i++) {
+                operation = ctx.operacion().get(i+1).getText();
+                this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
+                visitChildren(ctx.instruccion().get(i+1).bloque());
+                this.code += String.format("\nL%s", LblCount);
+            }
+        }
+        if (ctx.ELSE() != null){ // If there's an else block
+            visitChildren(ctx.instruccion().get(ctx.instruccion().size()-1).bloque());
+        }
+        return null;
+    }
 
     public void printCode(){
         System.out.println("\n=== INTERMEDIATE CODE ===");
