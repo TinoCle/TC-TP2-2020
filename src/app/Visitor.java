@@ -1,7 +1,9 @@
 package app;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -18,12 +20,28 @@ public class Visitor extends alBaseVisitor<String> {
     private String previousTemp;
     private String currentTemp;
 
+    private HashMap<String, String> opposites;
+    private String[] logicalOperators;
+
     public Visitor(){
         this.LblCount = 0;
         this.TmpCount = 0;
         this.code = "";
         this.previousTemp = "";
         this.currentTemp = "";
+
+        this.logicalOperators = new String[]{"&&", "||"};
+        this.opposites = new HashMap<String, String>();
+        loadOpposites();
+    }
+
+    private void loadOpposites(){
+        this.opposites.put("<", ">=");
+        this.opposites.put(">", "<=");
+        this.opposites.put("<=", ">");
+        this.opposites.put(">=", "<");
+        this.opposites.put("==", "!=");
+        this.opposites.put("!=", "==");
     }
 
     @Override
@@ -46,11 +64,11 @@ public class Visitor extends alBaseVisitor<String> {
     public String visitAsignacion(AsignacionContext ctx) {
         List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_factor);
         if (factores.size() <= 2){
-            this.code += ctx.ID().getText() + " = " + get2Factors(factores);
+            this.code += "\t" + ctx.ID().getText() + " = " + get2Factors(factores);
         } else{
             OpalContext opalCtx = ctx.asign().operacion().opal();
             processConjuncion(opalCtx);
-            code += ctx.ID().getText() + " = t" + (TmpCount - 1) + "\n";
+            code += "\t" + ctx.ID().getText() + " = t" + (TmpCount - 1) + "\n";
         }
         return null;
     }
@@ -60,11 +78,11 @@ public class Visitor extends alBaseVisitor<String> {
         if (ctx.asignacion() != null) {
             List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_factor);
             if (factores.size() <= 2){
-                this.code += ctx.asignacion().ID().getText() + " = " + get2Factors(factores);
+                this.code += "\t" + ctx.asignacion().ID().getText() + " = " + get2Factors(factores);
             } else{
                 OpalContext opalCtx = ctx.asignacion().asign().operacion().opal();
                 processConjuncion(opalCtx);
-                code += ctx.asignacion().ID().getText() + " = t" + (TmpCount - 1) + "\n";
+                code += "\t" + ctx.asignacion().ID().getText() + " = t" + (TmpCount - 1) + "\n";
             }
         }
         return null;
@@ -196,7 +214,7 @@ public class Visitor extends alBaseVisitor<String> {
                 code += operator + " " + factor + "\n";
             } else { //it's the first factor, so there's nothing on its left
                 String factor = Fctx.getText();
-                code += factor;
+                code += factor + " ";
                 if (terms.size() == 1){ //last one
                     code += "\n";
                 }
@@ -206,21 +224,106 @@ public class Visitor extends alBaseVisitor<String> {
     }
     
     private void concatTemps(String operation) {
-        this.code += String.format("t%d = %s %s %s \n", TmpCount, previousTemp, operation, currentTemp);
+        this.code += String.format("\tt%d = %s %s %s \n", TmpCount, previousTemp, operation, currentTemp);
         currentTemp = "t" + TmpCount;
         TmpCount++;
     }
 
     @Override
     public String visitIteracion(IteracionContext ctx) {
-        if (ctx.FOR() != null){
-            System.out.println("MODO GARLOPA");
-        }
-        if (ctx.WHILE() != null){
-            
+        /* List<ParseTree> operators = getRuleNodes((OperacionContext) ctx.getChild(4), alParser.RULE_comparaciones);
+        List<ParseTree> factores = getRuleNodes((OperacionContext) ctx.getChild(4), alParser.RULE_factor);
+        List<ParseTree>  = getRuleNodes((OperacionContext) ctx.getChild(4), alParser.RULE_factor); */
+        LblCount++;
+        int firstLbl = this.LblCount;
+        if (ctx.FOR() != null){ // FOR LOOP
+            if (ctx.getChild(2) instanceof DeclaracionContext){
+                visitDeclaracion((DeclaracionContext) ctx.getChild(2));
+            } else if (ctx.getChild(2) instanceof AsignacionContext){
+                visitAsignacion((AsignacionContext) ctx.getChild(2));
+            }
+            String operation = ctx.getChild(4).getText();
+            code += String.format("L%s:", LblCount);
+            this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
+            visitChildren(ctx.instruccion().bloque());
+            code += "\t" + ctx.getChild(6).getText() + "\n";
+            code += String.format("\tgoto L%s", firstLbl);
+            code += String.format("\nL%s:", LblCount);
+        } else if (ctx.getChild(0).getText().equals("while")){ // WHILE LOOP
+            String operation = ctx.operacion().get(0).getText();
+            code += String.format("\nL%s:", LblCount);
+            this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
+            visitChildren(ctx.instruccion().bloque());            
+            code += String.format("\tgoto L%s", firstLbl);
+            code += String.format("\nL%s:", LblCount);
+        } else{ // DO WHILE LOOP
+            code += String.format("\nL%s:", LblCount);
+            visitChildren(ctx.instruccion().bloque());
+            String operation = ctx.operacion().get(0).getText();
+            this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), LblCount);
         }
         return null;
     }
+
+    private String getOpossiteOperation(String operation){
+        StringBuilder newOperation = new StringBuilder();
+            for (int i = 0; i < operation.length(); i++) {     
+                if (i+2 <= operation.length()){
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(operation.charAt(i));
+                    sb.append(operation.charAt(i+1));
+                    String op = sb.toString();
+                    if (this.opposites.containsKey(op)){
+                        newOperation.append(" ");
+                        newOperation.append(this.opposites.get(op));
+                        newOperation.append(" ");
+                        i++;
+                    } else if (this.opposites.containsKey(String.valueOf(operation.charAt(i)))){
+                        newOperation.append(" ");
+                        newOperation.append(this.opposites.get(String.valueOf(operation.charAt(i))));
+                        newOperation.append(" ");
+                    } else if (Arrays.asList(this.logicalOperators).contains(op)){
+                        newOperation.append(" ");
+                        newOperation.append(op);
+                        newOperation.append(" ");
+                        i++;
+                    } else {
+                        newOperation.append(operation.charAt(i));
+                    }
+                } else{ //Last character
+                    newOperation.append(operation.charAt(i));
+                }       
+            }
+        return newOperation.toString();
+    }
+
+
+    private void getComparacion(OperacionContext ctx){
+        //System.out.println("Operator:" + ctx.opal().disyuncion().conjuncion().igualdad().comparaciones().getText());
+        List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_comparaciones);
+        for (int i = 0; i < factores.size(); i++) {
+            System.out.println("Operator:" + factores.get(i).getText());
+        }
+    }
+    /* @Override
+    public String visitCyclefor(CycleforContext ctx) {
+        countLbl++;
+
+        visitAssignment(ctx.assignment());
+
+        int aux = countLbl;
+        result += String.format("label L%s\n", countLbl);
+        countLbl++;
+        result += String.format("ifnot %s, jmp L%s\n", ctx.operation().getText(), countLbl);
+        visitBlock(ctx.instruction().block());
+
+        result += String.format("%s %s\n", ctx.ID().getText(), ctx.asign().getText());
+        result += String.format("jmp L%s\n", aux);
+        result += String.format("label L%s\n", countLbl);
+
+        return "";
+    } */
+    
 
     public void printCode(){
         System.out.println("\n=== INTERMEDIATE CODE ===");
