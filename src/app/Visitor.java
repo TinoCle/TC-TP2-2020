@@ -5,12 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Trees;
-
 import app.alParser.*;
 
 public class Visitor extends alBaseVisitor<String> {
@@ -23,7 +21,7 @@ public class Visitor extends alBaseVisitor<String> {
     private HashMap<String, String> opposites;
     private String[] logicalOperators;
 
-    public Visitor(){
+    public Visitor() {
         this.LblCount = 0;
         this.TmpCount = 0;
         this.code = "";
@@ -35,7 +33,7 @@ public class Visitor extends alBaseVisitor<String> {
         loadOpposites();
     }
 
-    private void loadOpposites(){
+    private void loadOpposites() {
         this.opposites.put("<", ">=");
         this.opposites.put(">", "<=");
         this.opposites.put("<=", ">");
@@ -49,7 +47,7 @@ public class Visitor extends alBaseVisitor<String> {
         return super.visit(tree);
     }
 
-    private List<ParseTree> getRuleNodes(ParseTree ctx, int ruleIndex){
+    private List<ParseTree> getRuleNodes(ParseTree ctx, int ruleIndex) {
         return new ArrayList<ParseTree>(Trees.findAllRuleNodes(ctx, ruleIndex));
     }
 
@@ -63,7 +61,7 @@ public class Visitor extends alBaseVisitor<String> {
     @Override
     public String visitAsignacion(AsignacionContext ctx) {
         List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_factor);
-        if (factores.size() <= 2){
+        if (factores.size() <= 2) {
             this.code += "\t" + ctx.ID().getText() + " = " + get2Factors(factores);
         } else{
             OpalContext opalCtx = ctx.asign().operacion().opal();
@@ -77,7 +75,7 @@ public class Visitor extends alBaseVisitor<String> {
     public String visitDeclaracion(DeclaracionContext ctx) {
         if (ctx.asignacion() != null) {
             List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_factor);
-            if (factores.size() <= 2){
+            if (factores.size() <= 2) {
                 this.code += "\t" + ctx.asignacion().ID().getText() + " = " + get2Factors(factores);
             } else{
                 OpalContext opalCtx = ctx.asignacion().asign().operacion().opal();
@@ -103,7 +101,7 @@ public class Visitor extends alBaseVisitor<String> {
         }
     }
 
-    private void processComparacion(DisyuncionContext ctx){
+    private void processComparacion(DisyuncionContext ctx) {
         List<ParseTree> conmparaciones = new ArrayList<ParseTree>();
         findRuleNodes(ctx, alParser.RULE_igualdad, conmparaciones);
         String temp;
@@ -157,7 +155,7 @@ public class Visitor extends alBaseVisitor<String> {
                     currentTemp = factors.get(0).getText(); // el actual es el primero de la lista 9 -> 9 + 1
                 }
             }
-            if(i > 0){ 
+            if(i > 0) { 
                 concatTemps(terms.get(i).getParent().getChild(0).getText());
             }
         }
@@ -166,8 +164,8 @@ public class Visitor extends alBaseVisitor<String> {
     private void generateTempsInTerm(Collection<ParseTree> factors) {
         List<ParseTree> factorsLocal = new ArrayList<ParseTree>(factors);
         String temp;
-        for(int i=0; i < factorsLocal.size(); i++){
-            if(((FactorContext)factorsLocal.get(i)).opal() != null){
+        for(int i=0; i < factorsLocal.size(); i++) {
+            if(((FactorContext)factorsLocal.get(i)).opal() != null) {
                 temp = currentTemp;
                 processConjuncion(((FactorContext) factorsLocal.get(i)).opal());
                 previousTemp = temp;
@@ -198,16 +196,16 @@ public class Visitor extends alBaseVisitor<String> {
         }
     }
 
-    private String get2Factors(List<ParseTree> terms){
+    private String get2Factors(List<ParseTree> terms) {
         String code = "";
         for (ParseTree parseTree : terms) {
             FactorContext Fctx = ((FactorContext)parseTree);
-            if (Fctx.getParent().getParent() instanceof alParser.ExpContext){ // if there's a + or -
+            if (Fctx.getParent().getParent() instanceof alParser.ExpContext) { // if there's a + or -
                 ExpContext exp = (ExpContext) Fctx.getParent().getParent();
                 String operator = exp.getChild(0).getText();
                 String factor = exp.getChild(1).getText();
                 code += operator + " " +  factor + "\n";
-            } else if (Fctx.getParent() instanceof alParser.TermContext){ //if there's a * or /
+            } else if (Fctx.getParent() instanceof alParser.TermContext) { //if there's a * or /
                 TermContext term = (TermContext) Fctx.getParent();
                 String operator = term.getChild(0).getText();
                 String factor = term.getChild(1).getText();
@@ -215,7 +213,7 @@ public class Visitor extends alBaseVisitor<String> {
             } else { //it's the first factor, so there's nothing on its left
                 String factor = Fctx.getText();
                 code += factor + " ";
-                if (terms.size() == 1){ //last one
+                if (terms.size() == 1) { //last one
                     code += "\n";
                 }
             }
@@ -236,10 +234,10 @@ public class Visitor extends alBaseVisitor<String> {
         List<ParseTree>  = getRuleNodes((OperacionContext) ctx.getChild(4), alParser.RULE_factor); */
         LblCount++;
         int firstLbl = this.LblCount;
-        if (ctx.FOR() != null){ // FOR LOOP
-            if (ctx.getChild(2) instanceof DeclaracionContext){
+        if (ctx.FOR() != null) { // FOR LOOP
+            if (ctx.getChild(2) instanceof DeclaracionContext) {
                 visitDeclaracion((DeclaracionContext) ctx.getChild(2));
-            } else if (ctx.getChild(2) instanceof AsignacionContext){
+            } else if (ctx.getChild(2) instanceof AsignacionContext) {
                 visitAsignacion((AsignacionContext) ctx.getChild(2));
             }
             String operation = ctx.getChild(4).getText();
@@ -249,7 +247,7 @@ public class Visitor extends alBaseVisitor<String> {
             code += "\t" + ctx.getChild(6).getText() + "\n";
             code += String.format("\tgoto L%s", firstLbl);
             code += String.format("\nL%s:", LblCount);
-        } else if (ctx.getChild(0).getText().equals("while")){ // WHILE LOOP
+        } else if (ctx.getChild(0).getText().equals("while")) { // WHILE LOOP
             String operation = ctx.operacion().get(0).getText();
             code += String.format("\nL%s:", LblCount);
             this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
@@ -265,24 +263,24 @@ public class Visitor extends alBaseVisitor<String> {
         return null;
     }
 
-    private String getOpossiteOperation(String operation){
+    private String getOpossiteOperation(String operation) {
         StringBuilder newOperation = new StringBuilder();
             for (int i = 0; i < operation.length(); i++) {     
-                if (i+2 <= operation.length()){
+                if (i+2 <= operation.length()) {
                     StringBuilder sb = new StringBuilder();
                     sb.append(operation.charAt(i));
                     sb.append(operation.charAt(i+1));
                     String op = sb.toString();
-                    if (this.opposites.containsKey(op)){
+                    if (this.opposites.containsKey(op)) {
                         newOperation.append(" ");
                         newOperation.append(this.opposites.get(op));
                         newOperation.append(" ");
                         i++;
-                    } else if (this.opposites.containsKey(String.valueOf(operation.charAt(i)))){
+                    } else if (this.opposites.containsKey(String.valueOf(operation.charAt(i)))) {
                         newOperation.append(" ");
                         newOperation.append(this.opposites.get(String.valueOf(operation.charAt(i))));
                         newOperation.append(" ");
-                    } else if (Arrays.asList(this.logicalOperators).contains(op)){
+                    } else if (Arrays.asList(this.logicalOperators).contains(op)) {
                         newOperation.append(" ");
                         newOperation.append(op);
                         newOperation.append(" ");
@@ -298,7 +296,7 @@ public class Visitor extends alBaseVisitor<String> {
     }
 
 
-    private void getComparacion(OperacionContext ctx){
+    private void getComparacion(OperacionContext ctx) {
         //System.out.println("Operator:" + ctx.opal().disyuncion().conjuncion().igualdad().comparaciones().getText());
         List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_comparaciones);
         for (int i = 0; i < factores.size(); i++) {
@@ -312,7 +310,7 @@ public class Visitor extends alBaseVisitor<String> {
         this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
         visitChildren(ctx.instruccion().get(0).bloque());
         this.code += String.format("\nL%s", LblCount);
-        if (ctx.ELIF() != null){ // If there's at least 1 else if block we iterate over all possible else if blocks
+        if (ctx.ELIF() != null) { // If there's at least 1 else if block we iterate over all possible else if blocks
             for (int i = 0; i < ctx.ELIF().size(); i++) {
                 operation = ctx.operacion().get(i+1).getText();
                 this.code += String.format("\tif %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
@@ -320,13 +318,47 @@ public class Visitor extends alBaseVisitor<String> {
                 this.code += String.format("\nL%s", LblCount);
             }
         }
-        if (ctx.ELSE() != null){ // If there's an else block
+        if (ctx.ELSE() != null) { // If there's an else block
             visitChildren(ctx.instruccion().get(ctx.instruccion().size()-1).bloque());
         }
         return null;
     }
 
-    public void printCode(){
+    @Override
+    public String visitDefinicion_funcion(Definicion_funcionContext ctx) {
+        this.code += ctx.ID().getText() + ":\n";
+        this.code += "\tBeginFunc\n";
+        visitChildren(ctx.bloque());
+        this.code += "\tEndFunc\n";
+        return null;
+    }
+
+    @Override
+    public String visitRetornar(RetornarContext ctx) {
+        processConjuncion(ctx.operacion().opal());
+        this.code += String.format("\treturn %s\n", currentTemp);
+        return null;
+    }
+
+    @Override
+    public String visitFuncion(FuncionContext ctx) {
+        ArrayList<String> params = new ArrayList<String>();
+        if (ctx.parametros() != null) {
+            List<ParseTree> operaciones = new ArrayList<ParseTree>();
+            findRuleNodes(ctx.parametros(), alParser.RULE_operacion, operaciones);
+            for (ParseTree operacion : operaciones) {
+                processConjuncion(((OperacionContext)operacion).opal());
+                params.add("pushParam " + currentTemp);
+            }
+        }
+        for (String param : params) {
+            this.code += "\t" + param + "\n";
+        }
+        this.code += "\tCALL " + ctx.ID() + "\n";
+        return null;
+    }
+
+    public void printCode() {
         System.out.println("\n=== INTERMEDIATE CODE ===");
         System.out.println(this.code);
     }
