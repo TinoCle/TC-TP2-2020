@@ -42,20 +42,8 @@ public class Visitor extends alBaseVisitor<String> {
         this.opposites.put("!=", "==");
     }
 
-    @Override
-    public String visit(ParseTree tree) {
-        return super.visit(tree);
-    }
-
     private List<ParseTree> getRuleNodes(ParseTree ctx, int ruleIndex) {
         return new ArrayList<ParseTree>(Trees.findAllRuleNodes(ctx, ruleIndex));
-    }
-
-    //Visit all children
-    public void visitChildren(RuleContext ctx) {
-        for (int hijo = 0; hijo < ctx.getChildCount(); hijo++) {
-            visit(ctx.getChild(hijo));
-        }
     }
 
     @Override
@@ -66,7 +54,7 @@ public class Visitor extends alBaseVisitor<String> {
         } else{
             OpalContext opalCtx = ctx.asign().operacion().opal();
             processConjuncion(opalCtx);
-            code += "\t" + ctx.ID().getText() + " = t" + (TmpCount - 1) + "\n";
+            this.code += "\t" + ctx.ID().getText() + " = t" + (TmpCount - 1) + "\n";
         }
         return null;
     }
@@ -80,7 +68,7 @@ public class Visitor extends alBaseVisitor<String> {
             } else{
                 OpalContext opalCtx = ctx.asignacion().asign().operacion().opal();
                 processConjuncion(opalCtx);
-                code += "\t" + ctx.asignacion().ID().getText() + " = t" + (TmpCount - 1) + "\n";
+                this.code += "\t" + ctx.asignacion().ID().getText() + " = t" + (TmpCount - 1) + "\n";
             }
         }
         return null;
@@ -200,12 +188,12 @@ public class Visitor extends alBaseVisitor<String> {
         String code = "";
         for (ParseTree parseTree : terms) {
             FactorContext Fctx = ((FactorContext)parseTree);
-            if (Fctx.getParent().getParent() instanceof alParser.ExpContext) { // if there's a + or -
+            if (Fctx.getParent().getParent() instanceof alParser.ExpContext) { // if there's a + or a -
                 ExpContext exp = (ExpContext) Fctx.getParent().getParent();
                 String operator = exp.getChild(0).getText();
                 String factor = exp.getChild(1).getText();
                 code += operator + " " +  factor + "\n";
-            } else if (Fctx.getParent() instanceof alParser.TermContext) { //if there's a * or /
+            } else if (Fctx.getParent() instanceof alParser.TermContext) { //if there's a * or a /
                 TermContext term = (TermContext) Fctx.getParent();
                 String operator = term.getChild(0).getText();
                 String factor = term.getChild(1).getText();
