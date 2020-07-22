@@ -11,6 +11,7 @@ public class CustomListener extends alBaseListener {
     alParser parser;
 
     public CustomListener(alParser parser) {
+        System.out.println("\n");
         this.parser = parser;
     }
 
