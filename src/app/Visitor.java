@@ -27,19 +27,20 @@ public class Visitor extends alBaseVisitor<String> {
         this.code = "";
         this.previousTemp = "";
         this.currentTemp = "";
-
         this.logicalOperators = new String[]{"&&", "||"};
-        this.opposites = new HashMap<String, String>();
         loadOpposites();
     }
 
     private void loadOpposites() {
-        this.opposites.put("<", ">=");
-        this.opposites.put(">", "<=");
-        this.opposites.put("<=", ">");
-        this.opposites.put(">=", "<");
-        this.opposites.put("==", "!=");
-        this.opposites.put("!=", "==");
+        this.opposites = new HashMap<String, String>()
+        {{
+            put("<", ">=");
+            put(">", "<=");
+            put("<=", ">");
+            put(">=", "<");
+            put("==", "!=");
+            put("!=", "==");
+        }};
     }
 
     private List<ParseTree> getRuleNodes(ParseTree ctx, int ruleIndex) {
