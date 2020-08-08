@@ -119,7 +119,10 @@ public class CustomListener extends alBaseListener {
     //Function Call
     @Override public void exitFuncion(alParser.FuncionContext ctx) {
         String functionName = ctx.ID().getText();
-        int paramCount = AuxFunctions.getFactors(ctx.parametros(), this.parser).size();
+        int paramCount = 0;
+        if (AuxFunctions.getFactors(ctx.parametros(), this.parser) != null) { // has parameters?
+            paramCount = AuxFunctions.getFactors(ctx.parametros(), this.parser).size();
+        }
         ID function = this.symbolTable.findVariable(functionName);
         if (function == null){
             error.implicitDeclaration(ctx.getStart().getLine(), functionName);
