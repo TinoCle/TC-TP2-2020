@@ -21,7 +21,9 @@ public class App {
         alParser parser = new alParser(tokens);
         
         CustomListener listener = new CustomListener(parser);
-
+        ErrorListener errorListener = new ErrorListener();
+        parser.removeErrorListeners();
+        parser.addErrorListener(errorListener);
         parser.addParseListener(listener);
         // Solicito al parser que comience indicando una regla gramatical
         // En este caso la regla es el simbolo inicial
