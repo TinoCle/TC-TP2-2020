@@ -1,12 +1,13 @@
 package app;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Trees;
 import app.alParser.*;
@@ -32,8 +33,7 @@ public class Visitor extends alBaseVisitor<String> {
     }
 
     private void loadOpposites() {
-        this.opposites = new HashMap<String, String>()
-        {{
+        this.opposites = new HashMap<String, String>() {{
             put("<", ">=");
             put(">", "<=");
             put("<=", ">");
@@ -285,13 +285,13 @@ public class Visitor extends alBaseVisitor<String> {
     }
 
 
-    private void getComparacion(OperacionContext ctx) {
-        //System.out.println("Operator:" + ctx.opal().disyuncion().conjuncion().igualdad().comparaciones().getText());
-        List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_comparaciones);
-        for (int i = 0; i < factores.size(); i++) {
-            System.out.println("Operator:" + factores.get(i).getText());
-        }
-    }
+    // private void getComparacion(OperacionContext ctx) {
+    //     //System.out.println("Operator:" + ctx.opal().disyuncion().conjuncion().igualdad().comparaciones().getText());
+    //     List<ParseTree> factores = getRuleNodes(ctx, alParser.RULE_comparaciones);
+    //     for (int i = 0; i < factores.size(); i++) {
+    //         System.out.println("Operator:" + factores.get(i).getText());
+    //     }
+    // }
     
     @Override
     public String visitCondicional(CondicionalContext ctx) {
@@ -347,9 +347,20 @@ public class Visitor extends alBaseVisitor<String> {
         return null;
     }
 
+    private void printCodeToFile() {
+        try {
+            PrintWriter out = new PrintWriter("intermediateCode.txt");
+            out.println(this.code);
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error saving intermediate code file: " + e.getMessage());
+        }
+    }
+
     public void printCode() {
         System.out.println("\n=== INTERMEDIATE CODE ===");
         System.out.println(this.code);
+        this.printCodeToFile();
     }
 
 }
