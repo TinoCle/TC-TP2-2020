@@ -1,4 +1,4 @@
-// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
+// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.8
 
     package app;
 
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class alParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -33,28 +33,38 @@ public class alParser extends Parser {
 		RULE_operacion = 18, RULE_expresion = 19, RULE_exp = 20, RULE_termino = 21, 
 		RULE_term = 22, RULE_factor = 23, RULE_prefix = 24, RULE_igualdad = 25, 
 		RULE_comparaciones = 26, RULE_conjuncion = 27, RULE_disyuncion = 28, RULE_opal = 29;
-	public static final String[] ruleNames = {
-		"prog", "instrucciones", "bloque", "balance", "instruccion", "declaracion_funcion", 
-		"retornar", "param_declaracion", "definicion_funcion", "param_definicion", 
-		"funcion", "parametros", "tipodato", "declaracion", "asign", "asignacion", 
-		"condicional", "iteracion", "operacion", "expresion", "exp", "termino", 
-		"term", "factor", "prefix", "igualdad", "comparaciones", "conjuncion", 
-		"disyuncion", "opal"
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"prog", "instrucciones", "bloque", "balance", "instruccion", "declaracion_funcion", 
+			"retornar", "param_declaracion", "definicion_funcion", "param_definicion", 
+			"funcion", "parametros", "tipodato", "declaracion", "asign", "asignacion", 
+			"condicional", "iteracion", "operacion", "expresion", "exp", "termino", 
+			"term", "factor", "prefix", "igualdad", "comparaciones", "conjuncion", 
+			"disyuncion", "opal"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
-	private static final String[] _LITERAL_NAMES = {
-		null, "'+'", "'-'", "'*'", "'/'", "'%'", "'++'", "'--'", "'('", "')'", 
-		"'['", "']'", "'{'", "'}'", "';'", "','", "'int'", "'double'", "'char'", 
-		"'void'", "'='", "'do'", "'while'", "'for'", "'if'", "'else if'", "'else'", 
-		"'<'", "'>'", "'<='", "'>='", "'=='", "'&&'", "'||'", "'!='", "'!'", "'return'"
-	};
-	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, null, null, null, null, "PA", "PC", "CA", "CC", 
-		"LA", "LC", "PYC", "COMA", "INT", "DOUBLE", "CHAR", "VOID", "EQ", "DO", 
-		"WHILE", "FOR", "IF", "ELIF", "ELSE", "MENOR", "MAYOR", "MENORIG", "MAYORIG", 
-		"IGUAL", "AND", "OR", "DIFF", "NOT", "RETURN", "ID", "NUMERO", "FLOTANTE", 
-		"LITERAL", "WS", "OTRO"
-	};
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "'+'", "'-'", "'*'", "'/'", "'%'", "'++'", "'--'", "'('", "')'", 
+			"'['", "']'", "'{'", "'}'", "';'", "','", "'int'", "'double'", "'char'", 
+			"'void'", "'='", "'do'", "'while'", "'for'", "'if'", "'else if'", "'else'", 
+			"'<'", "'>'", "'<='", "'>='", "'=='", "'&&'", "'||'", "'!='", "'!'", 
+			"'return'"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, null, null, null, null, null, null, null, "PA", "PC", "CA", "CC", 
+			"LA", "LC", "PYC", "COMA", "INT", "DOUBLE", "CHAR", "VOID", "EQ", "DO", 
+			"WHILE", "FOR", "IF", "ELIF", "ELSE", "MENOR", "MAYOR", "MENORIG", "MAYORIG", 
+			"IGUAL", "AND", "OR", "DIFF", "NOT", "RETURN", "ID", "NUMERO", "FLOTANTE", 
+			"LITERAL", "WS", "OTRO"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
@@ -104,6 +114,7 @@ public class alParser extends Parser {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
+
 	public static class ProgContext extends ParserRuleContext {
 		public InstruccionesContext instrucciones() {
 			return getRuleContext(InstruccionesContext.class,0);

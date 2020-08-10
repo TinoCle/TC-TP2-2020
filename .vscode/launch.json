@@ -21,13 +21,15 @@
             "name": "Debug current grammar",
             "type": "antlr-debug",
             "request": "launch",
-            // Archivo a parsear
+            // Archivo a parsear,
+            "grammar": "${file}",
             "input": "src/app/input.txt",
             // Simbolo inicial
             "startRule": "prog",
             // Muestra Arbol Sintactico
             "printParseTree": true,
             "visualParseTree": true
-            }
+        },
+
     ]
 }

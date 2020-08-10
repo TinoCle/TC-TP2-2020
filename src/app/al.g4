@@ -18,7 +18,7 @@ CC : ']' ;
 
 LA : '{' ;
 LC : '}' ; 
-
+ 
 PYC 	: ';' 	   ;
 COMA    : ','	   ;
 INT 	: 'int'    ;
@@ -167,7 +167,7 @@ prefix : '++'
 	   | '-'
 	   | NOT prefix
 	   |
-	   ;
+	   ; 
 
 igualdad : expresion
 		 | igualdad comparaciones expresion

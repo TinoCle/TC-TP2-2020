@@ -1,4 +1,4 @@
-// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.7.1
+// Generated from /home/gonzalo/Técnicas de Compilación/TC-TP2-2020/src/app/al.g4 by ANTLR 4.8
 
     package app;
 
@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class alLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -32,27 +32,37 @@ public class alLexer extends Lexer {
 		"DEFAULT_MODE"
 	};
 
-	public static final String[] ruleNames = {
-		"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "LETRA", "DIGITO", 
-		"PA", "PC", "CA", "CC", "LA", "LC", "PYC", "COMA", "INT", "DOUBLE", "CHAR", 
-		"VOID", "EQ", "DO", "WHILE", "FOR", "IF", "ELIF", "ELSE", "MENOR", "MAYOR", 
-		"MENORIG", "MAYORIG", "IGUAL", "AND", "OR", "DIFF", "NOT", "RETURN", "ID", 
-		"NUMERO", "FLOTANTE", "LITERAL", "WS", "OTRO"
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "LETRA", "DIGITO", 
+			"PA", "PC", "CA", "CC", "LA", "LC", "PYC", "COMA", "INT", "DOUBLE", "CHAR", 
+			"VOID", "EQ", "DO", "WHILE", "FOR", "IF", "ELIF", "ELSE", "MENOR", "MAYOR", 
+			"MENORIG", "MAYORIG", "IGUAL", "AND", "OR", "DIFF", "NOT", "RETURN", 
+			"ID", "NUMERO", "FLOTANTE", "LITERAL", "WS", "OTRO"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
-	private static final String[] _LITERAL_NAMES = {
-		null, "'+'", "'-'", "'*'", "'/'", "'%'", "'++'", "'--'", "'('", "')'", 
-		"'['", "']'", "'{'", "'}'", "';'", "','", "'int'", "'double'", "'char'", 
-		"'void'", "'='", "'do'", "'while'", "'for'", "'if'", "'else if'", "'else'", 
-		"'<'", "'>'", "'<='", "'>='", "'=='", "'&&'", "'||'", "'!='", "'!'", "'return'"
-	};
-	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, null, null, null, null, "PA", "PC", "CA", "CC", 
-		"LA", "LC", "PYC", "COMA", "INT", "DOUBLE", "CHAR", "VOID", "EQ", "DO", 
-		"WHILE", "FOR", "IF", "ELIF", "ELSE", "MENOR", "MAYOR", "MENORIG", "MAYORIG", 
-		"IGUAL", "AND", "OR", "DIFF", "NOT", "RETURN", "ID", "NUMERO", "FLOTANTE", 
-		"LITERAL", "WS", "OTRO"
-	};
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "'+'", "'-'", "'*'", "'/'", "'%'", "'++'", "'--'", "'('", "')'", 
+			"'['", "']'", "'{'", "'}'", "';'", "','", "'int'", "'double'", "'char'", 
+			"'void'", "'='", "'do'", "'while'", "'for'", "'if'", "'else if'", "'else'", 
+			"'<'", "'>'", "'<='", "'>='", "'=='", "'&&'", "'||'", "'!='", "'!'", 
+			"'return'"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, null, null, null, null, null, null, null, "PA", "PC", "CA", "CC", 
+			"LA", "LC", "PYC", "COMA", "INT", "DOUBLE", "CHAR", "VOID", "EQ", "DO", 
+			"WHILE", "FOR", "IF", "ELIF", "ELSE", "MENOR", "MAYOR", "MENORIG", "MAYORIG", 
+			"IGUAL", "AND", "OR", "DIFF", "NOT", "RETURN", "ID", "NUMERO", "FLOTANTE", 
+			"LITERAL", "WS", "OTRO"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
