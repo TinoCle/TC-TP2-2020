@@ -164,11 +164,11 @@ public class CustomListener extends alBaseListener {
         }
     }
  
-    @Override public void exitProg(alParser.ProgContext ctx) {
+    /* @Override public void exitProg(alParser.ProgContext ctx) {
         error.unusedVariables(symbolTable.getCurrentContextUnusedVariables(), symbolTable.getHistoricContext());
         if (!error.codeWithErrors) { // we print the entire symbol table only if there were no errors
             symbolTable.printSymboltable();
         }
         this.symbolTable.removeContext();
-    }
+    } */
 }

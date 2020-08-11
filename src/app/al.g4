@@ -151,6 +151,8 @@ term : '*' factor term
      |
      ;
 
+
+
 // F -> ( E ) | id
 factor : prefix PA opal PC
        | prefix NUMERO
@@ -181,13 +183,16 @@ comparaciones : IGUAL
 			  | MAYORIG
 			  ;
 
+// &&
 conjuncion : igualdad
 		   | conjuncion AND igualdad
 		   ;
-			
-disyuncion : conjuncion 
+
+// ||			
+disyuncion : conjuncion
 		   | disyuncion OR conjuncion
 		   ;
 
-opal : disyuncion 
+opal : disyuncion
+	 |
 	 ;
