@@ -16,9 +16,8 @@ public class ErrorListener extends BaseErrorListener{
         if (!sourceName.isEmpty()) {
             sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
         }
-        //ErrorReporter error = new ErrorReporter();
-        //error.missingSemicolon(line);
-        System.err.println(sourceName+"line "+line+":"+charPositionInLine+" "+msg);
-
+        ErrorReporter error = ErrorReporter.getInstance();
+        String position = line+":"+charPositionInLine;
+        error.syntaxError(position, msg);
     }
 }

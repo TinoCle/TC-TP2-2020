@@ -42,8 +42,19 @@ public class SymbolTable {
     public void insertID(ID id) {
         symbolTable.getLast().put(id.getName(), id);
         int index = symbolTable.size()-1;
-        historicSymbolTable.get(index).put(id.getName(), id);
-        
+        //System.out.println("INDEX:" + index);
+        historicSymbolTable.get(historicSymbolTable.size()-1).put(id.getName(), id);
+    }
+
+    public void insertFunction(Function function){
+        symbolTable.getLast().put(function.getName(), function);
+        if (symbolTable.size() == 0){
+            if (historicSymbolTable.size()>1){
+                historicSymbolTable.get(historicSymbolTable.size()-2).put(function.getName(), function);
+            } else{
+                historicSymbolTable.get(historicSymbolTable.size()-1).put(function.getName(), function);
+            }
+        }
     }
 
     public void insertParam(ID id){

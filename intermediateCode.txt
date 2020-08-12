@@ -1,3 +1,19 @@
-	t0 = 2 + 2 
-	t1 = t0 + 3 
-	x = t1 + 4 
+foo:
+BeginFunc
+PopParam x
+PopParam y
+t0 = x + y 
+return t0
+EndFunc
+main:
+BeginFunc
+y = 2
+pushParam 1
+pushParam 2
+x = CALL foo
+if x != y  goto L1
+x = 2
+L1
+return 1
+EndFunc
+

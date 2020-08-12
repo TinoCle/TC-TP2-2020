@@ -19,9 +19,7 @@ public class Visitor extends alBaseVisitor<String> {
     private String previousTmp;
     private String currentTmp;
     private String code;
-    private int identation;
-    private boolean addTmp = false;
-    private boolean auxTmp;
+    private boolean addTmp;
 
     private HashMap<String, String> opposites;
     private String[] logicalOperators;
@@ -29,12 +27,11 @@ public class Visitor extends alBaseVisitor<String> {
     public Visitor() {
         this.LblCount = 0;
         this.TmpCount = 0;
-        this.identation = 1;
         this.code = "";
         this.previousTmp = "";
         this.currentTmp = "";
-        this.auxTmp  = false;
         this.logicalOperators = new String[]{"&&", "||"};
+        this.addTmp = false;
         loadOpposites();
     }
 
@@ -49,100 +46,63 @@ public class Visitor extends alBaseVisitor<String> {
         }};
     }
 
+    /**
+     * getNodes obtiene todos los nodos del árbol que coincidan con la regla enviada como parametro
+     * @param ctx Árbol sobre el cual buscar la regla gramatical
+     * @param ruleIndex Regla a buscar
+     * @return Lista de todos los nodos coincidentes con la regla pasada por parámetro
+     */
     private List<ParseTree> getNodes(ParseTree ctx, int ruleIndex) {
         return new ArrayList<ParseTree>(Trees.findAllRuleNodes(ctx, ruleIndex));
     }
 
-    private List<ParseTree> getComparisons(ParseTree ctx) {
-        //there's no &&
-        if (Trees.findAllTokenNodes(ctx, alParser.AND).size() == 0){
-            //there's no ||
-            if (Trees.findAllTokenNodes(ctx, alParser.OR).size() == 0){
-                return new ArrayList<ParseTree>(Trees.findAllRuleNodes(ctx, alParser.RULE_comparaciones));
-            } else{
-                return new ArrayList<ParseTree>(Trees.findAllTokenNodes(ctx, alParser.OR));
-            }
-        } else{
-            return new ArrayList<ParseTree>(Trees.findAllTokenNodes(ctx, alParser.AND));
-        }
-    }
-
     @Override
     public String visitAsignacion(AsignacionContext ctx) {
-        List<ParseTree> factores = getNodes(ctx, alParser.RULE_factor);
-        if (factores.size() <= 2) {
-            List<ParseTree> opals = getComparisons(ctx);
-            this.code += "\t".repeat(this.identation) + ctx.ID().getText() + " = ";
-            add2Factors(factores, opals);
+        List<ParseTree> factor = getNodes(ctx, alParser.RULE_factor);
+        if (factor.size() == 1){
+            this.code +=  ctx.ID().getText() + " = " + factor.get(0).getText() + "\n";
         } else{
             OpalContext opalCtx = ctx.asign().operacion().opal();
             processOpal(opalCtx);
-            this.code += "\t".repeat(this.identation) + ctx.ID().getText() + " = t" + (TmpCount - 1) + "\n";
+            this.code = this.code.replace("t" + (TmpCount - 1), ctx.ID().getText());
+            TmpCount--;
         }
         return null;
-    }
-
-    public static String getLastLine(String string) {
-        List<String> lines = Arrays.asList(string.split("\n"));
-        return lines.subList(Math.max(0, lines.size() - 1), lines.size()).get(0);
     }
 
     @Override
     public String visitDeclaracion(DeclaracionContext ctx) {
         if (ctx.asignacion() != null) {
-            List<ParseTree> factores = getNodes(ctx, alParser.RULE_factor);
-            /* if (factores.size() <= 2) {
-                List<ParseTree> opals = getComparisons(ctx);
-                this.code += "\t".repeat(this.identation) + ctx.asignacion().ID().getText() + " = ";
-                add2Factors(factores, opals);
-            } else{ */
+            List<ParseTree> factor = getNodes(ctx, alParser.RULE_factor);
+            if (factor.size() == 1){
+                this.code +=  ctx.asignacion().ID().getText() + " = " + factor.get(0).getText() + "\n";
+            } else{
                 OpalContext opalCtx = ctx.asignacion().asign().operacion().opal();
                 processOpal(opalCtx);
-                String lastLine = getLastLine(code);
-                String newVarible = "\n\t".repeat(this.identation) + ctx.asignacion().ID().getText() + " " + lastLine.substring(lastLine.indexOf("="));
-                removeLastLine();
-                this.code += newVarible;
-                //System.out.println(lastLine.substring(lastLine.indexOf("=")));
-                //this.code += "\t".repeat(this.identation) + ctx.asignacion().ID().getText() + " = t" + (TmpCount - 1) + "\n";
-            /* } */
+                this.code = this.code.replace("t" + (TmpCount - 1), ctx.asignacion().ID().getText());
+                TmpCount--;
+            }
         }
         return null;
     }
-    
-    private void removeLastLine(){
-        int truncateIndex = this.code.length();
-        for (int i = 0; i < 2; i++) {
-            truncateIndex = this.code.lastIndexOf('\n', truncateIndex - 1);
-        }
-        this.code = this.code.substring(0, truncateIndex);
-    }
-    
-    public void findRuleNodes(ParseTree t, int index, List<ParseTree> nodes) {
-        if (t instanceof ParserRuleContext) {
-            ParserRuleContext ctx = (ParserRuleContext) t;
-            if (ctx.getRuleIndex() == index) {
-                nodes.add(t);
-            }
-        }
-        // check children
-        for (int i = 0; i < t.getChildCount(); i++) {
-            if (!(t.getChild(i) instanceof OpalContext)) {
-                findRuleNodes(t.getChild(i), index, nodes);
-            }
-        }
-    }
 
+    /**
+     * separateOR toma un Contexto de Opal para dividir a la operacion en ||, por ejemplo:
+     * si la operacion es: 1 + 2 == 3 || 3 - 2 == 1, el metodo retornara una lista que contiene: [1+2==3, 3-2==1]
+     * @param t Contexto de operación aritmetico lógica
+     * @return lista de los terminos divididor por ||
+     */
     private List<ParseTree> separateOR(ParseTree t){
         List<ParseTree> nodes = new ArrayList<ParseTree>();   
         List<ParseTree> aux = getNodes(t, alParser.RULE_disyuncion);
-        List<ParseTree> opals = getNodes(t, alParser.RULE_factor); // factors enclosed in parentheses, such as ((1+2)+3)
+        List<ParseTree> opals = getNodes(t, alParser.RULE_factor); // factores encerrados en parentesis, como ((1+2)+3)
         int count = 0;
         for (int i = 0; i < opals.size(); i++) {
             if (((FactorContext) opals.get(i)).PA() != null){
                 count++;
             }
         }
-        // need to get the amount of params used, cause they're included
+        // Necesito obtener la cantidad de parametros porque se incluyen como otros terminos
         int params = Trees.findAllRuleNodes(t, alParser.RULE_parametros).size();
         params = aux.size() == params ? 0 : params;
         for (int i = 0; i < aux.size() - params - count; i++) {
@@ -156,6 +116,12 @@ public class Visitor extends alBaseVisitor<String> {
         return nodes;
     }
 
+    /**
+     * separateAND toma un Contexto de Opal para dividir a la operacion segun los &&, por ejemplo:
+     * si la operacion es: 1 + 2 == 3 && 3 - 2 == 1, el metodo retornara una lista que contiene: [1+2==3, 3-2==1]
+     * @param t Contexto de Conjuncion
+     * @return Lista con todos los terminos divididos por &&
+     */
     private List<ParseTree> separateAND(ParseTree t){
         List<ParseTree> nodes = new ArrayList<ParseTree>();
         List<ParseTree> aux = getNodes(t, alParser.RULE_conjuncion);
@@ -179,6 +145,12 @@ public class Visitor extends alBaseVisitor<String> {
         return nodes;
     }
 
+    /**
+     * separateComparisons divide a los factores según los operadores booleanos presentes, por ejemplo si la operacion es:
+     * 1 + 3 == 2, el metodo retorna una lista igual a: [1+3, 2]
+     * @param t Contexto a tratar
+     * @return  lista con todos los factores separados por operación booleana
+     */
     private List<ParseTree> separateComparisons(ParseTree t){
         List<ParseTree> nodes = new ArrayList<ParseTree>();
         List<ParseTree> aux = getNodes(t, alParser.RULE_igualdad);
@@ -203,7 +175,10 @@ public class Visitor extends alBaseVisitor<String> {
         return nodes;
     }
 
-    // TREAT ||, first we need to separate operations by ||
+    /**
+     * processOpal toma un Opal Context para dividir la operación según los operadores lógicos OR
+     * @param ctx Contexto Opal
+     */
     private void processOpal(OpalContext ctx) {
         String operator = "||";
         List<ParseTree> terminos = separateOR(ctx);
@@ -218,7 +193,10 @@ public class Visitor extends alBaseVisitor<String> {
         }
     }
 
-    // TREAT &&, then we separate by &&
+    /**
+     * divideAND toma un Conjunción Context para dividir la operación según los operadores lógicos AND
+     * @param ctx
+     */
     private void divideAND(ParseTree ctx) {
         String operator = "&&";
         List<ParseTree> terminos = separateAND(ctx);
@@ -233,7 +211,10 @@ public class Visitor extends alBaseVisitor<String> {
         }
     }
 
-    //TREAT ==, !=, <, >, <=, >=
+    /**
+     * divideComparisons toma un contexto y divide a la operación por los operadores aritméticos presentes (==, !=, <, >, <=, >=)
+     * @param ctx
+     */
     private void divideComparisons(ParseTree ctx) {
         List<ParseTree> terminos = separateComparisons(ctx);
         String temp;
@@ -248,6 +229,11 @@ public class Visitor extends alBaseVisitor<String> {
         }
     }
 
+    /**
+     * processTerms procesa todos los términos en el contexto, analizando si dentro del término hay factores para procesarlos
+     * previamente
+     * @param ctx
+     */
     private void processTerms(ParseTree ctx) {
         List<ParseTree> ruleTerms = new ArrayList<ParseTree>();
         findRuleNodes(ctx, alParser.RULE_termino, ruleTerms);
@@ -284,13 +270,21 @@ public class Visitor extends alBaseVisitor<String> {
         }
     }
 
+    /**
+     * concatTemps concatena los temporales con una operación de por medio, tomando el temporal anterior
+     * y el temporal actual
+     * @param operation
+     */
     private void concatTemps(String operation) {
-        this.code += "\t".repeat(this.identation);
         this.code += String.format("t%d = %s %s %s \n", TmpCount, previousTmp, operation, currentTmp);
         currentTmp = "t" + TmpCount;
         TmpCount++;
     }
 
+    /**
+     * processFactors toma una lista de factores y realiza las operaciones presentes
+     * @param factors
+     */
     private void processFactors(List<ParseTree> factors) {
         String temp;
         for(int i=0; i < factors.size(); i++) {
@@ -317,7 +311,6 @@ public class Visitor extends alBaseVisitor<String> {
 
     @Override
     public String visitIteracion(IteracionContext ctx) {
-        this.identation++;
         LblCount++;
         int firstLbl = this.LblCount;
         if (ctx.FOR() != null) { // FOR LOOP
@@ -328,30 +321,24 @@ public class Visitor extends alBaseVisitor<String> {
             }
             String operation = ctx.getChild(4).getText();
             code += String.format("L%s:", LblCount);
-            this.code += "\t".repeat(this.identation);
             this.code += String.format("if %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
             visitChildren(ctx.instruccion().bloque());
-            code += "\t".repeat(this.identation) + ctx.getChild(6).getText() + "\n";
-            this.code += "\t".repeat(this.identation);
+            code +=  ctx.getChild(6).getText() + "\n";
             code += String.format("goto L%s", firstLbl);
             code += String.format("\nL%s:", LblCount);
         } else if (ctx.getChild(0).getText().equals("while")) { // WHILE LOOP
             String operation = ctx.operacion().get(0).getText();
             code += String.format("\nL%s:", LblCount);
-            this.code += "\t".repeat(this.identation);
             this.code += String.format("if %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
             visitChildren(ctx.instruccion().bloque());
-            this.code += "\t".repeat(this.identation);
             code += String.format("goto L%s", firstLbl);
             code += String.format("\nL%s:", LblCount);
         } else{ // DO WHILE LOOP
             code += String.format("\nL%s:", LblCount);
             visitChildren(ctx.instruccion().bloque());
             String operation = ctx.operacion().get(0).getText();
-            this.code += "\t".repeat(this.identation);
             this.code += String.format("if %s goto L%s\n", getOpossiteOperation(operation), LblCount);
         }
-        this.identation--;
         return null;
     }
 
@@ -370,18 +357,12 @@ public class Visitor extends alBaseVisitor<String> {
                     sb.append(operation.charAt(i+1));
                     String op = sb.toString();
                     if (this.opposites.containsKey(op)) {
-                        newOperation.append(" ");
                         newOperation.append(this.opposites.get(op));
-                        newOperation.append(" ");
                         i++;
                     } else if (this.opposites.containsKey(String.valueOf(operation.charAt(i)))) {
-                        newOperation.append(" ");
                         newOperation.append(this.opposites.get(String.valueOf(operation.charAt(i))));
-                        newOperation.append(" ");
                     } else if (Arrays.asList(this.logicalOperators).contains(op)) {
-                        newOperation.append(" ");
                         newOperation.append(op);
-                        newOperation.append(" ");
                         i++;
                     } else {
                         newOperation.append(operation.charAt(i));
@@ -393,62 +374,112 @@ public class Visitor extends alBaseVisitor<String> {
         return newOperation.toString();
     }
     
+    /**
+     * findRuleNodes busca todos los nodos que coincidan con la regla pasada por parametro, clasificando y 
+     * limpiando nodos residuales no pertenecientes a la regla
+     * @param t     Arbol sobre el cual buscar las reglas
+     * @param index Regla a buscar
+     * @param nodes Lista en la cual almacenar los nodos
+     */
+    public void findRuleNodes(ParseTree t, int index, List<ParseTree> nodes) {
+        if (t instanceof ParserRuleContext) {
+            ParserRuleContext ctx = (ParserRuleContext) t;
+            if (ctx.getRuleIndex() == index) {
+                nodes.add(t);
+            }
+        }
+        // check children
+        for (int i = 0; i < t.getChildCount(); i++) {
+            if (!(t.getChild(i) instanceof OpalContext)) {
+                findRuleNodes(t.getChild(i), index, nodes);
+            }
+        }
+    }
+
+    /**
+     * getLastLine toma un String para retornar la última línea
+     * @param string String sobre el cual obtener su última línea
+     * @return Devuelve la última línea del String
+     */
+    public String getLastLine(String string) {
+        List<String> lines = Arrays.asList(string.split("\n"));
+        return new ArrayList<>(lines.subList(Math.max(0, lines.size() - 1), lines.size())).get(0);
+    }
+
     @Override
     public String visitCondicional(CondicionalContext ctx) {
         LblCount++;
-        String operation = ctx.operacion().get(0).getText();
-        this.code += "\t".repeat(this.identation);
-        this.code += String.format("if %s goto L%s\n", getOpossiteOperation(operation), LblCount);
-        int aux = LblCount;
-        int aux2 = 0;
-       /*  int auxLbl1 = LblCount;
-        int auxLbl2 = ++LblCount; */
+        processOpal(ctx.operacion().get(0).opal());
+        String auxString = getLastLine(this.code);
+        String operation = auxString.substring(auxString.indexOf("=")+2);
+        this.code = this.code.replace(auxString, String.format("if %s goto L%s", getOpossiteOperation(operation), LblCount));
+        TmpCount--;
+        int lblGo = LblCount;
+        int aux1 = LblCount;
         visitChildren(ctx.instruccion().get(0).bloque());
-        if (ctx.ELIF() != null) { // If there's at least 1 else if block we iterate over all possible else if blocks
+        if (ctx.ELIF().size() > 0) { // If there's at least 1 else if block we iterate over all possible else if blocks
+            if (ctx.ELSE() == null){
+                lblGo = LblCount + ctx.ELIF().size();
+                this.code += String.format("goto L%s\n", lblGo);
+            } else{
+                lblGo = LblCount + ctx.ELIF().size() + 1;
+                this.code += String.format("goto L%s\n", lblGo);
+            }
             for (int i = 0; i < ctx.ELIF().size(); i++) {
-                operation = ctx.operacion().get(i+1).getText();
-                this.code += "\t".repeat(this.identation);
-                this.code += String.format("if %s goto L%s\n", getOpossiteOperation(operation), ++LblCount);
+                processOpal(ctx.operacion().get(i+1).opal());
+                auxString = getLastLine(this.code);
+                operation = auxString.substring(auxString.indexOf("=")+2);
+                this.code = this.code.replace(auxString, String.format("L%s if %s goto L%s", aux1, getOpossiteOperation(operation), ++LblCount));
+                TmpCount--;
+                aux1 = LblCount;
                 visitChildren(ctx.instruccion().get(i+1).bloque());
-                this.code += String.format("\nELSE IF L%s\n", LblCount);
+                if (i != ctx.ELIF().size()-1 && ctx.ELSE() == null){
+                    this.code += String.format("goto L%s\n", lblGo);
+                }
+            }
+            if (ctx.ELSE() == null){
+                this.code += String.format("L%s\n", LblCount);
             }
         }
         if (ctx.ELSE() != null) { // If there's an else block
-            this.code += "\t".repeat(this.identation);
-            this.code += String.format("goto L%s\n", ++LblCount);
-            this.code += String.format("ELSE L%s\n", aux);
-            aux = LblCount;
+            int elseAux = 0;
+            if (ctx.ELIF().size() == 0){
+                this.code += String.format("goto L%s\n", ++LblCount);
+                elseAux = LblCount;
+            }
+            this.code += String.format("L%s\n", aux1);
+            aux1 = LblCount;
             visitChildren(ctx.instruccion().get(ctx.instruccion().size()-1).bloque());
+            if (ctx.ELIF().size() == 0){
+                this.code += String.format("L%s\n", elseAux);
+            } else{
+                this.code += String.format("L%s\n", lblGo);
+            }
         }
-        this.code += String.format("IF L%s\n", aux);
+        if (ctx.ELIF().size() == 0 && ctx.ELSE() == null){
+            this.code += String.format("L%s\n", aux1);
+        }
         return null;
     }
 
     @Override
     public String visitDefinicion_funcion(Definicion_funcionContext ctx) {
-        this.code += "\t".repeat(this.identation);
         this.code += ctx.ID().getText() + ":\n";
-        this.identation++;
-        this.code += "\t".repeat(this.identation);
         this.code += "BeginFunc\n";
         String parameter;
         List<ParseTree> params = getNodes(ctx, alParser.RULE_param_definicion);
         for (int i = 0; i < params.size(); i++) {
             parameter = ((Param_definicionContext)params.get(i)).ID().getText();
-            this.code += "\t".repeat(this.identation);
             this.code += "PopParam " + parameter + "\n";
         }
         visitChildren(ctx.bloque());
-        this.code += "\t".repeat(this.identation);
         this.code += "EndFunc\n";
-        this.identation--;
         return null;
     }
 
     @Override
     public String visitRetornar(RetornarContext ctx) {
         processOpal(ctx.operacion().opal());
-        this.code += "\t".repeat(this.identation);
         this.code += String.format("return %s\n", currentTmp);
         return null;
     }
@@ -465,9 +496,8 @@ public class Visitor extends alBaseVisitor<String> {
             }
         }
         for (String param : params) {
-            this.code += "\t".repeat(this.identation) + param + "\n";
+            this.code += param + "\n";
         }
-        this.code += "\t".repeat(this.identation);
         if (this.addTmp){
             this.code += "t" + this.TmpCount + " = CALL " + ctx.ID() + "\n";
             TmpCount++;
@@ -477,6 +507,18 @@ public class Visitor extends alBaseVisitor<String> {
         return null;
     }
 
+    /**
+     * printCode guarda el código de tres direcciones en un archivo txt
+     */
+    public void printCode() {
+        System.out.println("\n=== THREE ADDRESS CODE ===");
+        System.out.println(this.code);
+        this.printCodeToFile();
+    }
+
+    /**
+     * printCodeToFile guarda el código de tres direcciones en un archivo txt en el root del proyecto
+     */
     private void printCodeToFile() {
         try {
             PrintWriter out = new PrintWriter("intermediateCode.txt");
@@ -485,55 +527,6 @@ public class Visitor extends alBaseVisitor<String> {
         } catch (FileNotFoundException e) {
             System.out.println("Error saving intermediate code file: " + e.getMessage());
         }
-    }
-
-    public void printCode() {
-        System.out.println("\n=== THREE ADDRESS CODE ===");
-        System.out.println(this.code);
-        this.printCodeToFile();
-    }
-
-    /**
-     * add2Factors toma 2 factores provenientes de una asignacion o declaracion de variable 
-     * @param factores
-     * @param opals
-     */
-    private void add2Factors(List<ParseTree> factores, List<ParseTree> opals) {
-        for (int i = 0; i < factores.size(); i++) {
-            FactorContext Fctx = ((FactorContext)factores.get(i));
-            if (i == 0){
-                String factor = Fctx.getText();
-                this.code += factor + " ";
-            } else if (Fctx.getParent().getParent() instanceof alParser.ExpContext) { // if there's a + or a -
-                ExpContext exp = (ExpContext) Fctx.getParent().getParent();
-                String operator = exp.getChild(0).getText();
-                this.code += operator + " ";
-                if (Fctx.funcion() != null){
-                    visitFuncion(Fctx.funcion());
-                } else{
-                    String factor = exp.getChild(1).getText();
-                    this.code += factor;
-                }
-            } else if (Fctx.getParent() instanceof alParser.TermContext) { //if there's a * or a /
-                TermContext term = (TermContext) Fctx.getParent();
-                String operator = term.getChild(0).getText();
-                this.code += operator + " ";
-                if (Fctx.funcion() != null){
-                    visitFuncion(Fctx.funcion());
-                } else{
-                    String factor = term.getChild(1).getText();
-                    this.code += factor;
-                }
-            } else if (i > 0 && opals.size() > 0){ //if there's a comparison or an && or ||
-                this.code += opals.get(0).getText() + " ";
-                if (Fctx.funcion() != null){
-                    visitFuncion(Fctx.funcion());
-                } else{
-                    this.code += Fctx.getText();
-                }
-            }
-        }
-        this.code += "\n";
     }
 
 }

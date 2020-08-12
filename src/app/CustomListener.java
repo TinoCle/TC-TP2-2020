@@ -20,7 +20,7 @@ public class CustomListener extends alBaseListener {
         if (ctx.getParent() instanceof Definicion_funcionContext) {
             Definicion_funcionContext fnCtx = (Definicion_funcionContext) ctx.getParent();
             Function function = AuxFunctions.processFunction(fnCtx);
-            this.symbolTable.insertID(function);
+            this.symbolTable.insertFunction(function);
             this.symbolTable.addContext();
             if (fnCtx.param_definicion() != null) {
                 for (ID id : function.getParams()) {
@@ -74,15 +74,38 @@ public class CustomListener extends alBaseListener {
             return;
         }
         for (FactorContext factor : factores) {
-            if (!AuxFunctions.compareTypes(leftID.getType(), factor)){
-                error.variableType(line);
-            } else {
-                symbolTable.updateId(AuxFunctions.setValue(leftID, factor));
+            if (factor.funcion() != null){
+                ID function = this.symbolTable.findVariable(factor.funcion().ID().getText());
+                if (function != null){
+                    if (!AuxFunctions.compareTypes(leftID.getType(), factor)){
+                        error.variableType(line);
+                    } else {
+                        symbolTable.updateId(AuxFunctions.setValue(leftID, factor));
+                    }    
+                }
+            } else if (factor.ID() != null){
+                ID variable = this.symbolTable.findVariable(factor.ID().getText());
+                if (variable != null){
+                    if (!AuxFunctions.compareTypes(leftID.getType(), factor)){
+                        error.variableType(line);
+                    } else {
+                        symbolTable.updateId(AuxFunctions.setValue(leftID, factor));
+                    }
+                } else{
+                    error.unexistentVariable(line, factor.ID().getText());
+                }
+            }
+            else{
+                if (!AuxFunctions.compareTypes(leftID.getType(), factor)){
+                    error.variableType(line);
+                } else {
+                    symbolTable.updateId(AuxFunctions.setValue(leftID, factor));
+                }
             }
         }
     }
 
-    //Function Prototype
+    //Prototipo de Función
     @Override public void exitDeclaracion_funcion(alParser.Declaracion_funcionContext ctx) {
         String type = ctx.tipodato().getText();
         String name = ctx.ID().getText();
@@ -105,7 +128,7 @@ public class CustomListener extends alBaseListener {
         }
     }
     
-    //Checking if function has return
+    //Para comprobar si la función tiene return
     @Override
     public void exitDefinicion_funcion(Definicion_funcionContext ctx) {
         if (!ctx.ID().getText().equals("main")){
@@ -116,7 +139,7 @@ public class CustomListener extends alBaseListener {
         }
     }
 
-    //Function Call
+    //Llamada a Función
     @Override public void exitFuncion(alParser.FuncionContext ctx) {
         String functionName = ctx.ID().getText();
         int paramCount = 0;
@@ -164,11 +187,11 @@ public class CustomListener extends alBaseListener {
         }
     }
  
-    /* @Override public void exitProg(alParser.ProgContext ctx) {
+    @Override public void exitProg(alParser.ProgContext ctx) {
         error.unusedVariables(symbolTable.getCurrentContextUnusedVariables(), symbolTable.getHistoricContext());
         if (!error.codeWithErrors) { // we print the entire symbol table only if there were no errors
             symbolTable.printSymboltable();
         }
         this.symbolTable.removeContext();
-    } */
+    }
 }

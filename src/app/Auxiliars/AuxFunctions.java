@@ -10,11 +10,12 @@ import app.alParser.*;
 
 public class AuxFunctions {
     /**
-    * Function used to retrieve everything about a function, it fetches its name, parameters, function type,
-    * also controlling its definition context, to check if it was declared in the global context and its 
-    * prototype in case of existing one
-    * @param  ctx  context where the function is beign defined
-    */
+     * processFunction obtiene toda la informacion acerca de una funcion, obtiene su nombre, sus parametros, tipo de dato de retorno,
+     * tambien controlando su contexto de definicion, para comprobar si fue declarada en el contexto global y comparandola con su
+     * prototipo en el caso de existir uno
+     * @param ctx contexto donde la funcion esta siendo usada
+     * @return
+     */
     public static Function processFunction (Definicion_funcionContext ctx) {
         SymbolTable symbolTable = SymbolTable.getInstance();
         ErrorReporter error = ErrorReporter.getInstance();
@@ -43,10 +44,11 @@ public class AuxFunctions {
     }
 
     /**
-     * Checks the function prototype definition whether the function was already declared  or it's not in the global context
+     * checkFunction comprueba la definicion del prototipo de la funcion, comprobando si ya fue declarada o si no se encuentra
+     * en el contexto global
      * @param function
      * @param ctx
-     * @return true or false to allow function prototype creation
+     * @return
      */
     public static boolean checkFunction(Function function, Declaracion_funcionContext ctx) {
         SymbolTable symbolTable = SymbolTable.getInstance();
@@ -65,12 +67,12 @@ public class AuxFunctions {
     }
     
     /**
-     * Goes through all children of "Definicion Context" or "Declaracion Context" to retrieve all its parameters along with its 
-     * corresponding type and name recursively, checking its parent context to realize whether it's in a prototype definition 
-     * context or a function declaration context
-     * @param ctx A ParserRuleContext to allow both param_definicion and param_declaracion to be used on the same method
-     * @param param A ArrayList to be used to store all parameters found in the function definition
-     * @return Returns an ArrayList containing all Function Parameters
+     * getParams recorre todos los nodos hijos de "Definicion Context" o "Declaracion Context", con el objetivo de obtener de
+     * forma recursiva todos sus parametros junto con su correspondiente tipo y nombre, comprobando tambien su contexto padre para
+     * averiguar si se encuentra en un contexto de definicion de funcion o de definicion de prototipo de funcion
+     * @param ctx param_definicion o param_declaracion context sobre el cual obtener todos sus parametros
+     * @param param ArrayList usado para obtener todos los parametros de forma recursiva
+     * @return Lista de parametros de la funcion
      */
     public static ArrayList<ID> getParams(ParserRuleContext ctx, ArrayList<ID> param) {
         if(ctx instanceof Param_declaracionContext) {
@@ -109,10 +111,10 @@ public class AuxFunctions {
     }
 
     /**
-     * setValue gets a Variable to set its value and at the same time update its state in the symbol table
-     * @param leftID Variable which is beign initialized
-     * @param factor variable/number/function that is being used to set variable's value
-     * @return
+     * setValue setea el valor de una variable actualizando a su vez su estado de uso en la tabla de simbolos
+     * @param leftID Variable siendo inicializada
+     * @param factor Factor que esta siendo asignado a la variable
+     * @return ID nuevo inicializado
      */
     public static ID setValue(ID leftID, FactorContext factor) {
         SymbolTable symbolTable = SymbolTable.getInstance();
@@ -126,13 +128,12 @@ public class AuxFunctions {
     }
 
     /**
-     * compareTypes gets a String indicating the variable's type and a factor that can be an ID, Function, number, character. 
-     * And compares in all cases if the Factor's data type is compatible with the variable's data type. 
-     * In case of an ID or a Function, it checks if these were initialized and defined. 
-     * If data types are not compatible, returns false.
-     * @param idType Variable's datatype
-     * @param factor potential candidate to be used to set variable's value
-     * @return a boolean indicating whether both dataTypes are compatible or not
+     * compareTypes recibe un String indicando el tipo de dato de la variable y un Factor (ID, Funcion, Numero, Caracter).
+     * Y compara si el tipo de dato del Factor es compatible con el tipo de dato de la variable
+     * En el caso de un ID o una Funcion, tambien comprueba si estos fueron inicializados y definidos
+     * @param idType Tipo de dato de la Variable
+     * @param factor Potencial candidato a ser usado para setear el valor de la variable
+     * @return Booleano indicando si los tipos de datos son compatibles (True) o no (False)
      */
     public static boolean compareTypes (String idType, FactorContext factor) {
         SymbolTable symbolTable = SymbolTable.getInstance();
@@ -171,9 +172,11 @@ public class AuxFunctions {
     }
 
     /**
-     * getFactors get all factors beign used in an operation, by going down in the tree finding all 'factor' nodes using XPath
-     * @param parseTree context where the factors are beign used
-     * @return an ArrayList containg all Factors used in the operation
+     * getFactors obtiene todos los factores siendo usados en una operacion, yendo hacia abajo en el arbol, buscando todos los nodos
+     * 'factor' usando XPath
+     * @param parseTree contexto donde los factores estan siendo usados
+     * @param parser Parser original, necesario para el uso de XPath
+     * @return Lista con todos los factores de la operación
      */
     public static ArrayList<FactorContext> getFactors(ParseTree parseTree, Parser parser) {
         ArrayList<FactorContext> factores = new ArrayList<FactorContext>();
@@ -188,11 +191,12 @@ public class AuxFunctions {
     }
 
     /**
-     * findFunctionCtx gets a return context to go up in the tree to find a definition context, to find out the function's return type.
-     * If a Function Definition Context is not found, a null value is returned, meaning that we 
-     * are putting a return statement outside a function context 
-     * @param parseTree return Function Context
-     * @return Function definition Context or null if not found
+     * findFunctionCtx parte de un Return Context para ir arriba en el árbol para buscar el contexto de definición de su función
+     * con el objetivo de obtener el tipo de dato de retorno de la funcion.
+     * Si no se encuentra un Contexto de Definición, se retorna null, indicando que la setencia return se encuentra fuera
+     * de un contexto de función
+     * @param parseTree Contexto Return
+     * @return El contexto de definición de función o null en caso de no ser encontrado
      */
     public static Definicion_funcionContext findFunctionCtx(ParseTree parseTree) {
         if (!(parseTree instanceof Definicion_funcionContext) && parseTree.getParent() != null) {
@@ -206,9 +210,10 @@ public class AuxFunctions {
     }
 
     /**
-     * hasExit gets a Definition Context to find a return statement in the tree by using XPath
-     * @param parseTree Definition Context
-     * @return a boolean indicating if a function has a return statement
+     * hasExit busca en un Contexto Definicion de función una sentencia return usando XPath
+     * @param parseTree Contexto Definicion
+     * @param parser Parser original, necesario para el uso de XPath 
+     * @return Booleano indicando la presencia o no de returns
      */
     public static boolean hasExit(ParseTree parseTree, Parser parser) {
         int returnCount = XPath.findAll(parseTree, "//retornar", parser).size();

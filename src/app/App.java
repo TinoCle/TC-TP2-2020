@@ -1,6 +1,9 @@
 package app;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+
+import app.Auxiliars.ErrorReporter;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -31,7 +34,10 @@ public class App {
 
         // Implementacion de Visitor
         Visitor visitor = new Visitor();
-        visitor.visit(tree);
-        visitor.printCode();
+        ErrorReporter error = ErrorReporter.getInstance();
+        if (!error.codeWithErrors){
+            visitor.visit(tree);
+            visitor.printCode();
+        }
     }
 }
